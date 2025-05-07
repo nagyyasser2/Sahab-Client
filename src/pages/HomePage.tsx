@@ -1,13 +1,19 @@
-import { useCurrentUser } from "../features/auth/authHooks";
+import ChatInput from "../components/layout/ChatInput";
+import ChatMessageList from "../components/layout/ChatMessageList";
+import Header from "../components/layout/Header";
+import Sidebar from "../components/layout/Sidebar";
 
 export const HomePage = () => {
-  const user = useCurrentUser();
-
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold">
-        Welcome to the Home Page {user?.username}
-      </h1>
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <main className="flex-1 flex flex-col">
+        <Header />
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+          <ChatMessageList />
+        </div>
+        <ChatInput />
+      </main>
     </div>
   );
 };

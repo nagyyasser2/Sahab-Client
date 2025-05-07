@@ -1,0 +1,13 @@
+const ChatInput = () => {
+  return (
+    <footer className="h-16 border-t border-gray-200 p-4 bg-white">
+      <input
+        type="text"
+        placeholder="Type a message..."
+        className="w-full p-2 border rounded"
+      />
+    </footer>
+  );
+};
+
+export default ChatInput;
