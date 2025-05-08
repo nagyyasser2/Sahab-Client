@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -69,11 +70,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
+        className="bg-white rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.3)] p-6 w-full max-w-md mx-4 transform transition-all"
       >
         <h2 className="text-xl font-semibold text-gray-800 mb-2">{title}</h2>
         <p className="text-gray-600 mb-6">{message}</p>
@@ -123,6 +124,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       </div>
     </div>
   );
+
+  const modalRoot = document.getElementById("modal-root");
+  if (!modalRoot) {
+    console.error("Modal root not found");
+    return null;
+  }
+
+  return createPortal(modalContent, modalRoot);
 };
 
 export default ConfirmationModal;

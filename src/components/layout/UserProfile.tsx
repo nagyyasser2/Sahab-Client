@@ -7,6 +7,9 @@ import Spinner from "../common/Spinner";
 import { authApi } from "../../api/endpoints/authApi";
 import logoUrl from "../../../public/test2.svg";
 import EditUserProfile from "./EditUserProfile";
+import OnlineStatus from "../OnlineStatus";
+import { IoLocationOutline } from "react-icons/io5";
+import { BiMobileAlt } from "react-icons/bi";
 
 interface UserProfileProps {
   user: User | null;
@@ -19,7 +22,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const handleOpenModal = useCallback(() => {
     setError(null);
@@ -114,11 +117,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
         aria-label="Toggle profile menu"
         aria-expanded={isExpanded}
       >
-        <img
-          src={logoUrl}
-          alt="Logo"
-          className="w-32 h-10 object-contain" // Set width with w-32 (128px)
-        />
+        <div className="flex items-center gap-0">
+          <img
+            src={logoUrl}
+            alt="Logo"
+            className="w-32 h-10 object-contain" // Set width with w-32 (128px)
+          />
+          <OnlineStatus />
+        </div>
         <div className="transform transition-transform duration-300 ease-in-out">
           {isExpanded ? (
             <FiChevronUp className="text-3xl" />
@@ -165,10 +171,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
             {user.username}
           </h2>
           {user.phoneNumber && (
-            <p className="text-sm text-gray-500 mt-1">{user.phoneNumber}</p>
+            <div className="flex items-center">
+              <BiMobileAlt />
+              <p className="text-sm text-gray-500 mt-1">{user.phoneNumber}</p>
+            </div>
           )}
           {user.country && (
-            <p className="text-sm text-gray-500">{user.country}</p>
+            <div className="flex items-center">
+              <IoLocationOutline />
+              <p className="text-sm text-gray-500">{user.country}</p>
+            </div>
           )}
           <button
             onClick={handleOpenEditProfile}
@@ -181,7 +193,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
           {/* Logout button */}
           <button
             onClick={handleOpenModal}
-            className="mt-1 flex items-center justify-center gap-2 text-gray-600 bg-white px-4 py-2 rounded-md cursor-pointer transition-all duration-200 w-full max-w-xs hover:text-gray-500"
+            className="mt-1 flex items-center justify-center gap-2  bg-white px-4 py-2 rounded-md cursor-pointer transition-all duration-200 w-full max-w-xs hover:text-gray-500"
             disabled={isLoggingOut}
             aria-label="Logout"
           >
@@ -189,7 +201,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
               <Spinner size="sm" color="secondary" />
             ) : (
               <>
-                <FiLogOut className="text-lg" />
+                <FiLogOut className="text-md" />
                 <span>Logout</span>
               </>
             )}
@@ -213,9 +225,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
         <EditUserProfile
           user={user}
           isOpen={isEditProfileOpen}
-          onSave={handleSaveProfile}
+          // onSave={handleSaveProfile}
           onCancel={handleCloseEditProfile}
-          onUpdatePicture={handleUpdateProfilePicture}
+          // onUpdatePicture={handleUpdateProfilePicture}
         />
       )}
     </div>

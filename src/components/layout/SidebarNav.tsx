@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 const SidebarNav = ({ activeTab, setActiveTab }: any) => {
   const tabs = [
     { id: "chats", label: "Chats" },

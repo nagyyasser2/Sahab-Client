@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../common/FormInput";
 import { FormSelect } from "../common/FormSelect";
@@ -10,13 +11,15 @@ import {
   countryValidator,
 } from "../../utils/validators";
 import type { User } from "../../features/auth/authTypes";
+import {
+  useUpdateProfilePicture,
+  useUpdateUserProfile,
+} from "../../features/users/usersHooks";
 
 interface EditUserProfileProps {
   user: User;
   isOpen: boolean;
-  onSave: (userData: any) => Promise<void>;
   onCancel: () => void;
-  onUpdatePicture?: (file: File) => Promise<void>;
 }
 
 const COUNTRIES = [
@@ -45,14 +48,12 @@ const COUNTRIES = [
 export const EditUserProfile: React.FC<EditUserProfileProps> = ({
   user,
   isOpen,
-  onSave,
   onCancel,
-  onUpdatePicture,
 }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       username: user.username || "",
@@ -62,17 +63,74 @@ export const EditUserProfile: React.FC<EditUserProfileProps> = ({
   });
 
   const [error, setError] = useState<string | null>(null);
-  const [isUploadingPicture, setIsUploadingPicture] = useState(false);
   const [picturePreview, setPicturePreview] = useState<string | null>(
     user.profilePic || null
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Handler for page reload after successful operations
+  const handleSuccess = () => {
+    window.location.reload();
+  };
+
+  const updateProfileMutation = useUpdateUserProfile({
+    onSuccess: handleSuccess,
+  });
+
+  const updatePictureMutation = useUpdateProfilePicture({
+    onSuccess: handleSuccess,
+  });
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (
+        event.key === "Escape" &&
+        isOpen &&
+        !updateProfileMutation.isPending
+      ) {
+        onCancel();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onCancel, updateProfileMutation.isPending]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        isOpen &&
+        !updateProfileMutation.isPending
+      ) {
+        onCancel();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onCancel, updateProfileMutation.isPending]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   const onSubmit = async (formData: any) => {
     setError(null);
     try {
-      await onSave(formData);
+      await updateProfileMutation.mutateAsync({
+        userData: formData,
+      });
     } catch (err) {
       console.error(err);
       setError("Failed to update user. Please try again.");
@@ -94,34 +152,39 @@ export const EditUserProfile: React.FC<EditUserProfileProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const handleCancel = () => {
+    onCancel();
+  };
+
   const handleUpdatePicture = async () => {
     const file = fileInputRef.current?.files?.[0];
-    if (!file || !onUpdatePicture) return;
+    if (!file) return;
 
-    setIsUploadingPicture(true);
     setError(null);
     try {
-      await onUpdatePicture(file);
+      await updatePictureMutation.mutateAsync({
+        file,
+      });
     } catch (err) {
       console.error(err);
       setError("Failed to update profile picture. Please try again.");
-    } finally {
-      setIsUploadingPicture(false);
     }
   };
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.4)] p-6 w-full max-w-md mx-4 transform transition-all"
+      >
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Edit Profile
         </h2>
 
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
-        {/* Profile Picture */}
         <div className="flex flex-col items-center mb-6">
           <div
             className="w-24 h-24 rounded-full overflow-hidden shadow-md border-2 border-gray-100 cursor-pointer relative group"
@@ -154,11 +217,11 @@ export const EditUserProfile: React.FC<EditUserProfileProps> = ({
           {fileInputRef.current?.files?.[0] && (
             <Button
               onClick={handleUpdatePicture}
-              isLoading={isUploadingPicture}
-              className="mt-2"
+              isLoading={updatePictureMutation.isPending}
+              className="mt-1 bg-blue-300 flex items-center gap-2 cursor-pointer text-sm"
             >
               <FiUpload size={14} />
-              Update Picture
+              Update
             </Button>
           )}
 
@@ -167,42 +230,50 @@ export const EditUserProfile: React.FC<EditUserProfileProps> = ({
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mb-6">
           <FormInput
             label="Username"
             {...register("username", usernameValidator)}
-            error={errors.username?.message}
           />
           <FormInput
             label="Phone Number"
             {...register("phoneNumber", phoneNumberValidator)}
-            error={errors.phoneNumber?.message}
           />
           <FormSelect
             label="Country"
             options={COUNTRIES}
             {...register("country", countryValidator)}
-            error={errors.country?.message}
           />
         </form>
 
-        {/* Buttons */}
         <div className="flex justify-end gap-3">
-          <Button variant="primary" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            onClick={handleCancel}
+            disabled={updateProfileMutation.isPending}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
+          >
             Cancel
           </Button>
           <Button
             type="submit"
             onClick={handleSubmit(onSubmit)}
-            isLoading={isSubmitting}
+            isLoading={updateProfileMutation.isPending}
+            className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
           >
-            Save Profile
+            Save
           </Button>
         </div>
       </div>
     </div>
   );
+
+  const modalRoot = document.getElementById("modal-root");
+  if (!modalRoot) {
+    console.error("Modal root not found");
+    return null;
+  }
+
+  return createPortal(modalContent, modalRoot);
 };
 
 export default EditUserProfile;

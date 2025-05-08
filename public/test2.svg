@@ -17,7 +17,7 @@
 
   <!-- Text integrated into the design -->
   <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" 
-        font-family="'Cairo', sans-serif" font-size="80" fill="#333"
+        font-family="'Cairo', sans-serif" font-size="80" fill="#066ab4"
         style="font-weight: 800; letter-spacing: -3px;">
     <tspan>S</tspan>
     <tspan dy="-10" style="font-size: 100px; fill: #FFD93D;">H</tspan> <!-- Highlighted "ح" -->
