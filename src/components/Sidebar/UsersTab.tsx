@@ -1,14 +1,9 @@
+import { useSelector } from "react-redux";
 import SearchUsersForm from "./SearchUsersForm";
+import { IoLocationOutline } from "react-icons/io5";
 
 const UsersTab = () => {
-  const users = [
-    { id: 1, name: "Alice", status: "online" },
-    { id: 2, name: "Bob", status: "offline" },
-    { id: 3, name: "Charlie", status: "busy" },
-    { id: 4, name: "Diana", status: "away" },
-    { id: 5, name: "Edward", status: "online" },
-    { id: 6, name: "Fiona", status: "offline" },
-  ];
+  const { users, loading, error } = useSelector((state: any) => state.users);
 
   const getStatusColor = (status: any) => {
     switch (status) {
@@ -18,6 +13,8 @@ const UsersTab = () => {
         return "bg-red-500";
       case "away":
         return "bg-yellow-500";
+      case "foucs":
+        return "bg-blue-500";
       default:
         return "bg-gray-400";
     }
@@ -30,24 +27,54 @@ const UsersTab = () => {
         <h3 className="text-xs uppercase tracking-wider text-gray-500 font-medium mb-2">
           Users
         </h3>
-        <ul className="space-y-2">
-          {users.map((user) => (
-            <li
-              key={user.id}
-              className="p-2 rounded hover:bg-gray-200 cursor-pointer flex items-center"
-            >
-              <div
-                className={`w-2 h-2 rounded-full ${getStatusColor(
-                  user.status
-                )} mr-2`}
-              ></div>
-              <span>{user.name}</span>
-              <span className="text-xs text-gray-500 ml-2">
-                • {user.status}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <p>Loading users...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <p>{error}</p>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="py-4 text-gray-500">No users found</div>
+        ) : (
+          <ul className="space-y-2">
+            {users.map((user: any) => (
+              <li
+                key={user._id}
+                className="p-2 rounded hover:bg-gray-200 cursor-pointer flex items-center"
+              >
+                <div
+                  className={`w-2 h-2 rounded-full ${getStatusColor(
+                    user.status
+                  )} mr-2`}
+                ></div>
+
+                {user.profilePic && (
+                  <img
+                    src={user.profilePic}
+                    alt={`${user.name || user.username}'s profile`}
+                    className="w-8 h-8 rounded-full object-cover mr-2"
+                  />
+                )}
+                <div className="flex flex-col items-center">
+                  <span>{user.name || user.username}</span>
+                  {user.country && (
+                    <div className="flex">
+                      <IoLocationOutline />
+                      <span className="text-xs text-gray-400">
+                        {user.country}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <span className="text-xs text-gray-500 ml-2">
+                  • {user.status || "unknown"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

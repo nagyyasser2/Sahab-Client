@@ -6,6 +6,7 @@ import storage from "redux-persist/lib/storage"; // localStorage
 import authReducer from "./slices/authSlice";
 import chatReducer from "./slices/chatSlice";
 import messageReducer from "./slices/messageSlice";
+import usersReducer from "./slices/usersSlice";
 
 // Middleware
 import socketMiddleware from "./middleware/socketMiddleware";
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   chats: persistReducer(chatPersistConfig, chatReducer),
   messages: persistReducer(messagePersistConfig, messageReducer),
+  users: persistReducer(messagePersistConfig, usersReducer),
 });
 
 const store = configureStore({

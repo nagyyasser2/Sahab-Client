@@ -23,7 +23,7 @@ const SearchUsersForm = () => {
       searchUsers({
         q: query.trim(),
         field,
-        fields: "username,email", // fixed fields
+        fields: "username,email,profilePic,status,country", // fixed fields
       }) as any
     );
   };
@@ -44,7 +44,7 @@ const SearchUsersForm = () => {
         {/* Search Button - Left side */}
         <button
           onClick={handleSubmit}
-          className="absolute left-4 text-gray-400 hover:text-blue-500 transition-colors focus:outline-none"
+          className="absolute left-4 text-gray-400 text-blue-500 transition-colors focus:outline-none"
           aria-label="Search"
         >
           <Search size={18} />
