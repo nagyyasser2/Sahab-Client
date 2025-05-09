@@ -77,4 +77,48 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+// API services
+export const chatService = {
+  getChats: () => axiosInstance.get("/chats"),
+  getChatById: (id: any) => axiosInstance.get(`/chats/${id}`),
+  createChat: (data: any) => axiosInstance.post("/chats", data),
+  updateChat: (id: any, data: any) => axiosInstance.put(`/chats/${id}`, data),
+  deleteChat: (id: any) => axiosInstance.delete(`/chats/${id}`),
+};
+
+export const messageService = {
+  getMessages: (chatId: any) => axiosInstance.get(`/chats/${chatId}/messages`),
+  sendMessage: (chatId: any, data: any) =>
+    axiosInstance.post(`/chats/${chatId}/messages`, data),
+  updateMessage: (id: any, data: any) =>
+    axiosInstance.put(`/messages/${id}`, data),
+  deleteMessage: (id: any) => axiosInstance.delete(`/messages/${id}`),
+};
+
+export const authService = {
+  login: (credentials: any) => axiosInstance.post("/auth/login", credentials),
+  register: (userData: any) => axiosInstance.post("/auth/register", userData),
+  logout: () => axiosInstance.post("/auth/logout"),
+  getCurrentUser: () => axiosInstance.get("/auth/me"),
+};
+
+export const usersService = {
+  getAllUsers: () => axiosInstance.get("/users"),
+  getUserById: (id: any) => axiosInstance.get(`/users/${id}`),
+  createUser: (data: any) => axiosInstance.post("/users", data),
+  updateUser: (id: any, data: any) => axiosInstance.put(`/users/${id}`, data),
+  deleteUser: (id: any) => axiosInstance.delete(`/users/${id}`),
+
+  // Add this for search
+  searchUsers: (
+    q: string,
+    field: "username" | "phoneNumber" | "country",
+    fields?: string
+  ) => {
+    const params: any = { q, field };
+    if (fields) params.fields = fields;
+    return axiosInstance.get("/users/search", { params });
+  },
+};
+
 export default axiosInstance;

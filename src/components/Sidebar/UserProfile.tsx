@@ -6,10 +6,10 @@ import ConfirmationModal from "../common/ConfirmationModal";
 import Spinner from "../common/Spinner";
 import { authApi } from "../../api/endpoints/authApi";
 import logoUrl from "../../../public/test2.svg";
-import EditUserProfile from "./EditUserProfile";
 import OnlineStatus from "../OnlineStatus";
 import { IoLocationOutline } from "react-icons/io5";
 import { BiMobileAlt } from "react-icons/bi";
+import EditUserProfile from "./EditUserProfile";
 
 interface UserProfileProps {
   user: User | null;
@@ -193,7 +193,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
           {/* Logout button */}
           <button
             onClick={handleOpenModal}
-            className="mt-1 flex items-center justify-center gap-2  bg-white px-4 py-2 rounded-md cursor-pointer transition-all duration-200 w-full max-w-xs hover:text-gray-500"
+            className="mt-1 flex items-center justify-center gap-2  bg-white px-4 py-2 rounded-md cursor-pointer transition-all duration-200  max-w-xs hover:text-gray-500"
             disabled={isLoggingOut}
             aria-label="Logout"
           >

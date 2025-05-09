@@ -1,3 +1,5 @@
+import SearchUsersForm from "./SearchUsersForm";
+
 const UsersTab = () => {
   const users = [
     { id: 1, name: "Alice", status: "online" },
@@ -23,7 +25,8 @@ const UsersTab = () => {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="p-4">
+      <SearchUsersForm />
+      <div className="py-4 px-4 pt-2">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 font-medium mb-2">
           Users
         </h3>

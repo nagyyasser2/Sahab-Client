@@ -22,12 +22,7 @@ const Header = ({ username, toggleSidebar }: HeaderProps) => {
         </button>
       )}
 
-      <h1 className="text-xl font-semibold">
-        {username ||
-          (user?.username
-            ? `Welcome, ${user.username}nagy yasser ahmed fathy mohamed ali`
-            : "Chat App")}
-      </h1>
+      <h1 className="text-xl font-semibold"></h1>
     </header>
   );
 };

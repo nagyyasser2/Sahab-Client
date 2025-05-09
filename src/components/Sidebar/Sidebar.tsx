@@ -2,9 +2,9 @@ import { useCurrentUser } from "../../features/auth/authHooks";
 import { useState } from "react";
 import UserProfile from "./UserProfile";
 import SidebarNav from "./SidebarNav";
-import ChatsTab from "./ChatsTab";
 import GroupsTab from "./GroupsTab";
 import UsersTab from "./UsersTab";
+import ChatsTab from "./ChatsTab";
 
 const Sidebar = () => {
   const user = useCurrentUser();

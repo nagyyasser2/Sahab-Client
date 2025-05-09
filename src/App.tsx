@@ -1,8 +1,8 @@
 import "./App.css";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { HomePage } from "./components/layout/HomePage";
 import { AuthContainer } from "./features/auth/AuthContainer";
 import { Route, Routes } from "react-router-dom";
-import { HomePage } from "./pages/HomePage";
 
 function App() {
   return (
