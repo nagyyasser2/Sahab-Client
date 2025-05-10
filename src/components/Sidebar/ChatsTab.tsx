@@ -1,3 +1,6 @@
+import { useDispatch } from "react-redux";
+import { setCurrentChat } from "../../store/slices/chatSlice";
+
 const ChatsTab = () => {
   const recentChats = [
     {
@@ -23,6 +26,12 @@ const ChatsTab = () => {
     },
   ];
 
+  const dispatch = useDispatch();
+
+  const handleChatSelection = (chat: any) => {
+    dispatch(setCurrentChat(chat));
+  };
+
   return (
     <div className="flex-1 overflow-y-auto ">
       <div className="p-4">
@@ -34,6 +43,7 @@ const ChatsTab = () => {
             <li
               key={chat.id}
               className="p-2 rounded hover:bg-gray-200 cursor-pointer flex justify-between items-center"
+              onClick={() => handleChatSelection(chat)}
             >
               <div>
                 <span className="font-medium">{chat.name}</span>

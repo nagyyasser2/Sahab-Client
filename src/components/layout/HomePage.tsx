@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../Sidebar/Sidebar";
-import Header from "./Header";
-import ChatMessageList from "./ChatMessageList";
-import ChatInput from "./ChatInput";
 import { Provider } from "react-redux";
 import { persistor, store } from "../../store";
 import { PersistGate } from "redux-persist/integration/react";
 import socket from "../../api/socket";
+import ChatSection from "./ChatSection.";
 export const HomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -53,13 +51,7 @@ export const HomePage = () => {
           </div>
 
           {/* Main content */}
-          <main className="flex-1 flex flex-col w-full">
-            <Header toggleSidebar={toggleSidebar} />
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-              <ChatMessageList />
-            </div>
-            <ChatInput />
-          </main>
+          <ChatSection toggleSidebar={toggleSidebar} />
         </div>
         <div id="modal-root"></div>
       </PersistGate>

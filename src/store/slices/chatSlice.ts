@@ -88,7 +88,7 @@ const chatSlice = createSlice({
   name: "chats",
   initialState: {
     chats: [],
-    currentChat: null,
+    currentChat: {} as any,
     loading: false,
     error: null,
     userStatuses: {}, // Track online/offline status of users

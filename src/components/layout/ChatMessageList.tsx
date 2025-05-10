@@ -1,8 +1,26 @@
-const ChatMessageList = () => {
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+
+type ChatMessageListProps = {
+  currentChat: any;
+};
+
+const ChatMessageList = ({ currentChat }: ChatMessageListProps) => {
+  console.log(currentChat);
+  // const dispatch = useDispatch();
+  // const [messages, setMessages] = useState([]);
+
+  // useEffect(() => {
+  //   const messages = dispatch(currentChat.id);
+  //   setMessages(messages);
+  // }, [currentChat]);
+
   return (
     <div>
-      <p className="mb-2">User: Hello!</p>
-      <p className="mb-2">You: Hi there!</p>
+      {/* {messages.map((msg: any) => (
+        <p>{msg.text}</p>
+      ))} */}
+      <p className="mb-2">{currentChat.lastMessage}</p>
     </div>
   );
 };

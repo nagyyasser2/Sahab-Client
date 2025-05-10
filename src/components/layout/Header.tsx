@@ -1,14 +1,11 @@
-import { useCurrentUser } from "../../features/auth/authHooks";
 import { CiMenuFries } from "react-icons/ci";
 
 type HeaderProps = {
-  username?: string;
+  currentChat: any;
   toggleSidebar?: () => void;
 };
 
-const Header = ({ username, toggleSidebar }: HeaderProps) => {
-  const user = useCurrentUser();
-
+const Header = ({ currentChat, toggleSidebar }: HeaderProps) => {
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4">
       {/* Menu icon for mobile, visible only on small screens */}
@@ -21,8 +18,9 @@ const Header = ({ username, toggleSidebar }: HeaderProps) => {
           <CiMenuFries className="h-6 w-6 text-gray-800 cursor-pointer" />
         </button>
       )}
-
-      <h1 className="text-xl font-semibold"></h1>
+      <div>
+        <h1 className="text-xl font-semibold">{currentChat?.name}</h1>
+      </div>
     </header>
   );
 };

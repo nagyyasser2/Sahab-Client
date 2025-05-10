@@ -61,6 +61,11 @@ const messageSlice = createSlice({
     typingUsers: {}, // { chatId: [userIds] }
   },
   reducers: {
+    findChatMessages: (state: any, action) => {
+      const { chatId } = action.payload;
+
+      return state.messagesByChatId[chatId];
+    },
     // Add message from socket
     addMessage: (state: any, action) => {
       const message = action.payload;
@@ -174,6 +179,7 @@ const messageSlice = createSlice({
 });
 
 export const {
+  findChatMessages,
   addMessage,
   markAsRead,
   setTyping,

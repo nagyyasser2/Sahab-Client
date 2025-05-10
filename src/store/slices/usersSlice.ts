@@ -29,12 +29,16 @@ const usersSlice = createSlice({
   name: "users",
   initialState: {
     users: [] as any[],
+    selectedUser: null as any,
     loading: false,
     error: null as string | null,
   },
   reducers: {
     clearUserError: (state) => {
       state.error = null;
+    },
+    setSelectedUser: (state, action) => {
+      state.selectedUser = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -55,5 +59,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { clearUserError } = usersSlice.actions;
+export const { clearUserError, setSelectedUser } = usersSlice.actions;
 export default usersSlice.reducer;
