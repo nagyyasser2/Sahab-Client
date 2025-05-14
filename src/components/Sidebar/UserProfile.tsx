@@ -6,17 +6,22 @@ import ConfirmationModal from "../common/ConfirmationModal";
 import Spinner from "../common/Spinner";
 import { authApi } from "../../api/endpoints/authApi";
 import logoUrl from "../../../public/test2.svg";
-import OnlineStatus from "../OnlineStatus";
+import OnlineStatus from "../common/OnlineStatus";
 import { IoLocationOutline } from "react-icons/io5";
 import { BiMobileAlt } from "react-icons/bi";
 import EditUserProfile from "./EditUserProfile";
 
 interface UserProfileProps {
   user: User | null;
+  socketConnected: boolean;
   onLogoutSuccess?: () => void;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
+const UserProfile: React.FC<UserProfileProps> = ({
+  user,
+  onLogoutSuccess,
+  socketConnected,
+}) => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -123,7 +128,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogoutSuccess }) => {
             alt="Logo"
             className="w-32 h-10 object-contain" // Set width with w-32 (128px)
           />
-          <OnlineStatus />
+          <OnlineStatus connectionStatus={socketConnected} />
         </div>
         <div className="transform transition-transform duration-300 ease-in-out">
           {isExpanded ? (

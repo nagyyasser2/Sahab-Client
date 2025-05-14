@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { chatService } from "../../api/axiosInstance";
 import { SOCKET_ACTIONS } from "../../api/socket";
+import type { ChatState, ParticipantUser, PrivacySettings } from "../../types";
 
 // Async thunks
 export const fetchChats = createAsyncThunk(
@@ -17,7 +18,7 @@ export const fetchChats = createAsyncThunk(
 
 export const fetchChatById = createAsyncThunk(
   "chats/fetchChatById",
-  async (chatId, { dispatch, rejectWithValue }) => {
+  async (chatId: string, { dispatch, rejectWithValue }) => {
     try {
       const response = await chatService.getChatById(chatId);
 
@@ -39,7 +40,7 @@ export const fetchChatById = createAsyncThunk(
 
 export const createChat = createAsyncThunk(
   "chats/createChat",
-  async (chatData, { rejectWithValue }) => {
+  async (chatData: any, { rejectWithValue }) => {
     try {
       const response = await chatService.createChat(chatData);
       return response.data;
@@ -51,7 +52,10 @@ export const createChat = createAsyncThunk(
 
 export const updateChat = createAsyncThunk(
   "chats/updateChat",
-  async ({ chatId, data }: any, { rejectWithValue }) => {
+  async (
+    { chatId, data }: { chatId: string; data: any },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await chatService.updateChat(chatId, data);
       return response.data;
@@ -63,7 +67,7 @@ export const updateChat = createAsyncThunk(
 
 export const deleteChat = createAsyncThunk(
   "chats/deleteChat",
-  async (chatId, { dispatch, rejectWithValue }) => {
+  async (chatId: string, { dispatch, rejectWithValue }) => {
     try {
       await chatService.deleteChat(chatId);
 
@@ -83,54 +87,129 @@ export const deleteChat = createAsyncThunk(
   }
 );
 
+const privacySettings: PrivacySettings = {
+  lastSeenVisibility: "everyone",
+  profilePhotoVisibility: "everyone",
+};
+
+const participantUser: ParticipantUser = {
+  _id: "",
+  username: "",
+  country: "",
+  profilePic: "",
+  status: "",
+  lastSeen: "",
+  privacySettings: privacySettings,
+};
+
+const initCurrentChat = {
+  _id: "",
+  conversationKey: "",
+  lastMessage: "",
+  isActive: false,
+  lastActivityAt: "",
+  unreadMessagesCount: 0,
+  blockedBy: [],
+  isArchived: false,
+  messageCount: 0,
+  otherParticipant: participantUser,
+};
+
+// Initial state
+const initialState: ChatState = {
+  chats: [],
+  currentChat: initCurrentChat,
+  loading: false,
+  error: null,
+  userStatuses: {},
+};
+
 // Slice
 const chatSlice = createSlice({
   name: "chats",
-  initialState: {
-    chats: [],
-    currentChat: {} as any,
-    loading: false,
-    error: null,
-    userStatuses: {}, // Track online/offline status of users
-  },
+  initialState,
   reducers: {
     setCurrentChat: (state, action) => {
       state.currentChat = action.payload;
     },
-    clearCurrentChat: (state) => {
-      state.currentChat = null;
+    clearCurrentChat: (state: ChatState) => {
+      state.currentChat = initCurrentChat;
     },
-    updateUserStatus: (state: any, action) => {
+    updateUserStatus: (state, action) => {
       const { userId, status } = action.payload;
       state.userStatuses[userId] = status;
 
-      // Update user status in chats if it's a direct message
-      state.chats = state.chats.map((chat: any) => {
-        if (chat.type === "direct" && chat.participants.includes(userId)) {
+      // Update user status in chats' otherParticipant if it matches the userId
+      state.chats = state.chats.map((chat) => {
+        if (chat.otherParticipant._id === userId) {
           return {
             ...chat,
-            participants: chat.participants.map((participant: any) =>
-              participant.userId === userId
-                ? { ...participant, status }
-                : participant
-            ),
+            otherParticipant: {
+              ...chat.otherParticipant,
+              status,
+            },
           };
         }
         return chat;
       });
     },
-    addChatToList: (state: any, action: any) => {
+    addChatToList: (state: ChatState, action) => {
       state.chats.unshift(action.payload);
     },
-    updateChatInList: (state: any, action: any) => {
+    updateChatInList: (state, action) => {
       const updatedChat = action.payload;
-      state.chats = state.chats.map((chat: any) =>
-        chat.id === updatedChat.id ? updatedChat : chat
+      state.chats = state.chats.map((chat) =>
+        chat._id === updatedChat._id ? updatedChat : chat
       );
 
       // Also update currentChat if it's the one being updated
-      if (state.currentChat && state.currentChat.id === updatedChat.id) {
+      if (state.currentChat && state.currentChat._id === updatedChat._id) {
         state.currentChat = updatedChat;
+      }
+    },
+    archiveChat: (state, action) => {
+      const chatId = action.payload;
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId ? { ...chat, isArchived: true } : chat
+      );
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        state.currentChat = { ...state.currentChat, isArchived: true };
+      }
+    },
+    unarchiveChat: (state, action) => {
+      const chatId = action.payload;
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId ? { ...chat, isArchived: false } : chat
+      );
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        state.currentChat = { ...state.currentChat, isArchived: false };
+      }
+    },
+    updateLastActivity: (state, action) => {
+      const { chatId, timestamp } = action.payload;
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId ? { ...chat, lastActivityAt: timestamp } : chat
+      );
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        state.currentChat = { ...state.currentChat, lastActivityAt: timestamp };
+      }
+    },
+    incrementMessageCount: (state, action) => {
+      const chatId = action.payload;
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId
+          ? { ...chat, messageCount: chat.messageCount + 1 }
+          : chat
+      );
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        state.currentChat = {
+          ...state.currentChat,
+          messageCount: state.currentChat.messageCount + 1,
+        };
       }
     },
   },
@@ -141,49 +220,49 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchChats.fulfilled, (state, action) => {
+      .addCase(fetchChats.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.chats = action.payload as any;
+        state.chats = action.payload;
       })
       .addCase(fetchChats.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as any) || "Failed to fetch chats";
+        state.error = action.payload || "Failed to fetch chats";
       })
       // Fetch single chat
       .addCase(fetchChatById.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchChatById.fulfilled, (state, action) => {
+      .addCase(fetchChatById.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.currentChat = action.payload as any;
+        state.currentChat = action.payload;
       })
       .addCase(fetchChatById.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as any) || "Failed to fetch chat";
+        state.error = action.payload || "Failed to fetch chat";
       })
       // Create chat
-      .addCase(createChat.fulfilled, (state: any, action) => {
+      .addCase(createChat.fulfilled, (state, action: any) => {
         state.chats.unshift(action.payload);
       })
       // Update chat
-      .addCase(updateChat.fulfilled, (state: any, action: any) => {
+      .addCase(updateChat.fulfilled, (state, action: any) => {
         const updatedChat = action.payload;
-        state.chats = state.chats.map((chat: any) =>
-          chat.id === updatedChat.id ? updatedChat : chat
+        state.chats = state.chats.map((chat) =>
+          chat._id === updatedChat._id ? updatedChat : chat
         );
 
-        if (state.currentChat && state.currentChat.id === updatedChat.id) {
+        if (state.currentChat && state.currentChat._id === updatedChat._id) {
           state.currentChat = updatedChat;
         }
       })
       // Delete chat
-      .addCase(deleteChat.fulfilled, (state: any, action) => {
+      .addCase(deleteChat.fulfilled, (state, action) => {
         const chatId = action.payload;
-        state.chats = state.chats.filter((chat: any) => chat.id !== chatId);
+        state.chats = state.chats.filter((chat) => chat._id !== chatId);
 
-        if (state.currentChat && state.currentChat.id === chatId) {
-          state.currentChat = null;
+        if (state.currentChat && state.currentChat._id === chatId) {
+          state.currentChat = initCurrentChat;
         }
       });
   },
@@ -195,5 +274,10 @@ export const {
   updateUserStatus,
   addChatToList,
   updateChatInList,
+  archiveChat,
+  unarchiveChat,
+  updateLastActivity,
+  incrementMessageCount,
 } = chatSlice.actions;
+
 export default chatSlice.reducer;

@@ -1,7 +1,7 @@
 const SidebarNav = ({ activeTab, setActiveTab }: any) => {
   const tabs = [
     { id: "chats", label: "Chats" },
-    { id: "groups", label: "Groups" },
+    // { id: "groups", label: "Groups" },
     { id: "users", label: "Users" },
   ];
 

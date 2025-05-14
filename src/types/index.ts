@@ -5,16 +5,6 @@ export interface User {
   email?: string;
 }
 
-export interface Chat {
-  id: string;
-  name: string;
-  type: "direct" | "group";
-  participants: string[];
-  lastMessageId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface Message {
   id: string;
   chatId: string;
@@ -31,14 +21,6 @@ export interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-}
-
-export interface ChatState {
-  chats: Chat[];
-  currentChat: Chat | null;
-  loading: boolean;
-  error: string | null;
-  userStatuses: Record<string, "online" | "offline">;
 }
 
 export interface MessageState {
@@ -63,4 +45,41 @@ export interface ActionWithSocket {
   socket?: SocketAction;
   type: string;
   payload?: any;
+}
+
+// Define types based on the provided example
+export interface PrivacySettings {
+  lastSeenVisibility: "everyone" | "contacts" | "nobody";
+  profilePhotoVisibility: "everyone" | "contacts" | "nobody";
+}
+
+export interface ParticipantUser {
+  _id: string;
+  username: string;
+  country?: string;
+  profilePic?: string;
+  status?: string | null;
+  lastSeen?: string;
+  privacySettings?: PrivacySettings;
+}
+
+export interface Chat {
+  _id: string;
+  lastMessage: string;
+  unreadMessagesCount: number;
+  conversationKey: string;
+  isActive: boolean;
+  lastActivityAt: string;
+  blockedBy: string[];
+  isArchived: boolean;
+  messageCount: number;
+  otherParticipant: ParticipantUser;
+}
+
+export interface ChatState {
+  chats: Chat[];
+  currentChat: Chat;
+  loading: boolean;
+  error: any;
+  userStatuses: Record<string, string | null>;
 }
