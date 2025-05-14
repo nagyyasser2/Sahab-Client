@@ -20,8 +20,8 @@ const Header = ({ currentChat, toggleSidebar }: HeaderProps) => {
       )}
       <div className="flex items-center space-x-2">
         <img
-          src={currentChat.otherParticipant.profilePic}
-          alt={currentChat.otherParticipant.username}
+          src={currentChat.otherParticipant?.profilePic}
+          alt={currentChat.otherParticipant?.username}
           className="w-10 h-10 rounded-full object-cover"
         />
         <span className="text-xl font-semibold">

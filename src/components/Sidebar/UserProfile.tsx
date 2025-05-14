@@ -10,19 +10,48 @@ import OnlineStatus from "../common/OnlineStatus";
 import { IoLocationOutline } from "react-icons/io5";
 import { BiMobileAlt } from "react-icons/bi";
 import EditUserProfile from "./EditUserProfile";
+import { useDispatch } from "react-redux";
+import { setCurrentChat } from "../../store/slices/chatSlice";
 
 interface UserProfileProps {
   user: User | null;
   socketConnected: boolean;
   onLogoutSuccess?: () => void;
+  closeSidebar: () => void;
 }
+
+const initCurrentChat = {
+  _id: "",
+  conversationKey: "",
+  lastMessage: "",
+  isActive: false,
+  lastActivityAt: "",
+  unreadMessagesCount: 0,
+  blockedBy: [],
+  isArchived: false,
+  messageCount: 0,
+  otherParticipant: {
+    _id: "",
+    username: "",
+    country: "",
+    profilePic: "",
+    status: "",
+    lastSeen: "",
+    privacySettings: {
+      lastSeenVisibility: "everyone",
+      profilePhotoVisibility: "everyone",
+    },
+  },
+};
 
 const UserProfile: React.FC<UserProfileProps> = ({
   user,
   onLogoutSuccess,
   socketConnected,
+  closeSidebar,
 }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -105,6 +134,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
     }
   }, [navigate, isLoggingOut, onLogoutSuccess]);
 
+  const handleLogoClick = () => {
+    dispatch(setCurrentChat(initCurrentChat));
+    closeSidebar();
+  };
   if (!user) {
     return (
       <div className="flex justify-center items-center h-36">
@@ -116,28 +149,34 @@ const UserProfile: React.FC<UserProfileProps> = ({
   return (
     <div className="relative bg-white shadow-sm">
       {/* Menu button */}
-      <button
-        onClick={toggleExpand}
-        className="w-full flex items-center justify-between px-2 py-2 text-gray-600 bg-gray-100 hover:bg-gray-150 cursor-pointer transition-all duration-200"
+      <div
+        className="w-full flex items-center justify-between px-2 py-2 text-gray-600 bg-gray-100 hover:bg-gray-150  transition-all duration-200"
         aria-label="Toggle profile menu"
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-0">
           <img
+            onClick={() => handleLogoClick()}
             src={logoUrl}
             alt="Logo"
-            className="w-32 h-10 object-contain" // Set width with w-32 (128px)
+            className="w-32 h-10 object-contain cursor-pointer" // Set width with w-32 (128px)
           />
           <OnlineStatus connectionStatus={socketConnected} />
         </div>
         <div className="transform transition-transform duration-300 ease-in-out">
           {isExpanded ? (
-            <FiChevronUp className="text-3xl" />
+            <FiChevronUp
+              className="text-3xl cursor-pointer"
+              onClick={toggleExpand}
+            />
           ) : (
-            <FiChevronDown className="text-3xl" />
+            <FiChevronDown
+              className="text-3xl cursor-pointer"
+              onClick={toggleExpand}
+            />
           )}
         </div>
-      </button>
+      </div>
 
       {/* Expanded profile content */}
       {isExpanded && (

@@ -43,15 +43,14 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                 <div className="flex items-center space-x-2">
                   <img
                     src={chat.otherParticipant.profilePic}
-                    alt={chat.otherParticipant.username}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
                     <span className="font-medium">
-                      {chat.otherParticipant.username}
+                      {chat.otherParticipant?.username}
                     </span>
                     <p className="text-xs text-gray-500 truncate">
-                      {chat.lastMessage || "No messages yet"}
+                      {chat?.lastMessage || "No messages yet"}
                     </p>
                   </div>
                 </div>

@@ -9,7 +9,6 @@ const ChatInput = ({ currentChat }: ChatMessageListProps) => {
         type="text"
         placeholder="Type a message..."
         className="w-full p-2 border rounded"
-        disabled={currentChat?.lastMessage ? false : true}
       />
     </footer>
   );

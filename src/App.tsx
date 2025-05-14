@@ -16,6 +16,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="*" element={<p>have a nice day</p>} />
     </Routes>
   );
 }

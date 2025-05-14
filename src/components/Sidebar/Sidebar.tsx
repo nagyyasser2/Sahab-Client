@@ -17,7 +17,11 @@ const Sidebar = ({ closeSidebar, socketConnected = false }: SideBarProp) => {
 
   return (
     <aside className="w-95 h-full bg-white border-r border-gray-200 flex flex-col">
-      <UserProfile user={user} socketConnected={socketConnected} />
+      <UserProfile
+        user={user}
+        socketConnected={socketConnected}
+        closeSidebar={closeSidebar}
+      />
       <SidebarNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === "chats" && <ChatsTab closeSidebar={closeSidebar} />}

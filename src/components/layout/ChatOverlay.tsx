@@ -35,10 +35,10 @@ const ChatOverlay = ({ toggleSidebar }: ChatSectionProp) => {
           <h2 className="text-2xl font-semibold text-gray-500 mb-2">
             Select a Chat
           </h2>
-          <p className="text-gray-600 mb-2 bg-gray-200 rounded px-3 py-1 inline-block">
+          <p className="text-gray-600 mb-2 bg-gray-200 rounded px-2 py-1 inline-block">
             Choose a conversation from the sidebar or start a new chat
           </p>
-          <p className="text-gray-600 mb-4 bg-gray-200 rounded px-3 py-1 inline-block">
+          <p className="text-gray-600 mb-4 bg-gray-200 rounded px-2 py-1 inline-block">
             to begin messaging.
           </p>
         </div>
