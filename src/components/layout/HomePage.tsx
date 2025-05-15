@@ -32,7 +32,7 @@ export const HomePage = () => {
         setSocketConnected(true);
 
         // Fetch chats once socket is connected
-        store.dispatch(fetchChats() as any);
+        store.dispatch(fetchChats({}) as any);
       });
 
       // Listen for socket disconnect event
@@ -52,31 +52,33 @@ export const HomePage = () => {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <div className="flex h-screen overflow-hidden bg-gray-200">
-          {/* Mobile sidebar overlay - more visible content with subtle blur */}
-          {isSidebarOpen && (
+        <div className="bg-gray-200 min-h-screen">
+          <div className="max-w-[2000px] mx-auto flex h-screen overflow-hidden">
+            {/* Mobile sidebar overlay - more visible content with subtle blur */}
+            {isSidebarOpen && (
+              <div
+                className="fixed inset-0 bg-white/10 backdrop-blur-[2px] z-20 md:hidden"
+                onClick={closeSidebar}
+              />
+            )}
+
+            {/* Sidebar - hidden on mobile by default, can be toggled */}
             <div
-              className="fixed inset-0 bg-white/10 backdrop-blur-[2px] z-20 md:hidden"
-              onClick={closeSidebar}
-            />
-          )}
+              className={`fixed inset-y-0 left-0 transform ${
+                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+              } md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 md:z-0`}
+            >
+              <Sidebar
+                closeSidebar={closeSidebar}
+                socketConnected={socketConnected}
+              />
+            </div>
 
-          {/* Sidebar - hidden on mobile by default, can be toggled */}
-          <div
-            className={`fixed inset-y-0 left-0 transform ${
-              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            } md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 md:z-0`}
-          >
-            <Sidebar
-              closeSidebar={closeSidebar}
-              socketConnected={socketConnected}
-            />
+            {/* Main content */}
+            <ChatSection toggleSidebar={toggleSidebar} />
           </div>
-
-          {/* Main content */}
-          <ChatSection toggleSidebar={toggleSidebar} />
+          <div id="modal-root"></div>
         </div>
-        <div id="modal-root"></div>
       </PersistGate>
     </Provider>
   );

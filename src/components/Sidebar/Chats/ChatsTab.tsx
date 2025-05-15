@@ -110,7 +110,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                     : "bg-white text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <FiArrowLeft className="w-6 h-6" />
+                <FiArrowLeft className="w-6 h-6 cursor-pointer" />
               </button>
               <div>
                 <p className="text-sm text-gray-700">
@@ -131,7 +131,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                     : "bg-white text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <FiArrowRight className="w-6 h-6" />
+                <FiArrowRight className="w-6 h-6 cursor-pointer" />
               </button>
             </div>
           </div>

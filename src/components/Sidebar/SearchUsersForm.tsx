@@ -50,7 +50,7 @@ const SearchUsersForm = ({ onSearch }: SearchUsersFormProps) => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto mb-5 mt-2 px-2 pb-1">
+    <div className="w-full max-w-lg mx-auto mb-0 mt-2 px-2 pb-1">
       <div
         className={`relative flex items-center rounded-full border border-gray-300 transition-all duration-300 ${
           isFocused ? "border-blue-500 shadow-sm" : ""

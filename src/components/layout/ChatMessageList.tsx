@@ -98,7 +98,7 @@ const ChatMessageList = ({ currentChat }: ChatMessageListProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 p-4 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gray-50 p-0 overflow-y-auto">
       <div className="flex-1 space-y-4">
         {messages.map((message) => {
           const isMyMessage = message.senderId === user._id;

@@ -1,3 +1,4 @@
+// to enhance the performance: "https://claude.ai/chat/679ad60d-d60f-4de0-a95c-275f95b0c7bc"
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { chatService } from "../../api/axiosInstance";
 import { SOCKET_ACTIONS } from "../../api/socket";
@@ -14,15 +15,20 @@ export const fetchChats = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      // Calculate skip parameter from page for backend API
       const skip = (page - 1) * limit;
-      const response = await chatService.getChats({
+      const response: any = await chatService.getChats({
         skip,
         limit,
         includeArchived,
       });
+
+      // The backend now returns { chats, total } directly
+      const { chats, total } = response.data;
+
       return {
-        chats: response.data.chats || response.data,
-        total: response.data.total || response.data.length,
+        chats,
+        total,
         page,
         limit,
       };
@@ -141,6 +147,8 @@ const initialState: ChatState = {
   total: 0,
   page: 1,
   limit: 10,
+  hasMore: false,
+  skip: 0,
 };
 
 // Slice

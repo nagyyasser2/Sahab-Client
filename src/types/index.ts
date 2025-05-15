@@ -84,4 +84,7 @@ export interface ChatState {
   userStatuses: Record<string, string | null>;
   hasMore: boolean;
   skip: number;
+  total: number;
+  page: number;
+  limit: number;
 }
