@@ -82,4 +82,6 @@ export interface ChatState {
   loading: boolean;
   error: any;
   userStatuses: Record<string, string | null>;
+  hasMore: boolean;
+  skip: number;
 }

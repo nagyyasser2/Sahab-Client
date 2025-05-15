@@ -4,7 +4,14 @@ import { Search } from "lucide-react";
 import type { AppDispatch } from "../../store";
 import { searchUsers } from "../../store/slices/usersSlice";
 
-const SearchUsersForm = () => {
+type SearchUsersFormProps = {
+  onSearch: (params: {
+    q: string;
+    field: "username" | "phoneNumber" | "country";
+  }) => void;
+};
+
+const SearchUsersForm = ({ onSearch }: SearchUsersFormProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [query, setQuery] = useState("");
@@ -19,11 +26,19 @@ const SearchUsersForm = () => {
 
     if (!query.trim()) return;
 
+    // Call the onSearch prop to update the parent component's state
+    onSearch({
+      q: query.trim(),
+      field,
+    });
+
+    // Also dispatch the action directly to maintain compatibility
     dispatch(
       searchUsers({
         q: query.trim(),
         field,
         fields: "username,email,profilePic,status,country", // fixed fields
+        page: 1, // Reset to first page on new search
       }) as any
     );
   };
@@ -37,14 +52,16 @@ const SearchUsersForm = () => {
   return (
     <div className="w-full max-w-lg mx-auto mb-5 mt-2 px-2 pb-1">
       <div
-        className={`relative flex items-center rounded-full border border-gray-300 transition-all duration-300 `}
+        className={`relative flex items-center rounded-full border border-gray-300 transition-all duration-300 ${
+          isFocused ? "border-blue-500 shadow-sm" : ""
+        } ${isHovered && !isFocused ? "border-gray-400" : ""}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Search Button - Left side */}
         <button
           onClick={handleSubmit}
-          className="absolute left-4 text-gray-400 text-blue-500 transition-colors focus:outline-none"
+          className="absolute left-4 text-gray-400 hover:text-blue-500 transition-colors focus:outline-none"
           aria-label="Search"
         >
           <Search size={18} />

@@ -79,11 +79,28 @@ axiosInstance.interceptors.response.use(
 
 // API services
 export const chatService = {
-  getChats: () => axiosInstance.get("/chats"),
-  getChatById: (id: any) => axiosInstance.get(`/chats/${id}`),
+  getChats: ({
+    skip = 0,
+    limit = 10,
+    includeArchived = false,
+  }: {
+    skip?: number;
+    limit?: number;
+    includeArchived?: boolean;
+  }) =>
+    axiosInstance.get("/chats", {
+      params: {
+        skip,
+        limit,
+        includeArchived,
+      },
+    }),
+
+  getChatById: (id: string) => axiosInstance.get(`/chats/${id}`),
   createChat: (data: any) => axiosInstance.post("/chats", data),
-  updateChat: (id: any, data: any) => axiosInstance.put(`/chats/${id}`, data),
-  deleteChat: (id: any) => axiosInstance.delete(`/chats/${id}`),
+  updateChat: (id: string, data: any) =>
+    axiosInstance.put(`/chats/${id}`, data),
+  deleteChat: (id: string) => axiosInstance.delete(`/chats/${id}`),
 };
 
 export const messageService = {
@@ -109,13 +126,15 @@ export const usersService = {
   updateUser: (id: any, data: any) => axiosInstance.put(`/users/${id}`, data),
   deleteUser: (id: any) => axiosInstance.delete(`/users/${id}`),
 
-  // Add this for search
+  // Updated searchUsers with pagination
   searchUsers: (
     q: string,
     field: "username" | "phoneNumber" | "country",
-    fields?: string
+    fields?: string,
+    page: number = 1,
+    limit: number = 10
   ) => {
-    const params: any = { q, field };
+    const params: any = { q, field, page, limit };
     if (fields) params.fields = fields;
     return axiosInstance.get("/users/search", { params });
   },

@@ -111,9 +111,9 @@ const ChatMessageList = ({ currentChat }: ChatMessageListProps) => {
               }`}
             >
               <div
-                className={`max-w-md px-4 py-2 rounded-3xl shadow ${
+                className={`max-w-md px-4 py-2 rounded-xl shadow ${
                   isMyMessage
-                    ? "bg-blue-600 text-white rounded-br-none"
+                    ? "bg-blue-500 text-white rounded-br-none"
                     : "bg-white text-gray-800 rounded-bl-none"
                 }`}
               >

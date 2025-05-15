@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { usersService } from "../../api/axiosInstance";
 
+// Async thunk with pagination
 export const searchUsers = createAsyncThunk(
   "users/search",
   async (
@@ -8,16 +9,26 @@ export const searchUsers = createAsyncThunk(
       q,
       field,
       fields,
+      page = 1,
+      limit = 10,
     }: {
       q: string;
       field: "username" | "phoneNumber" | "country";
       fields?: string;
+      page?: number;
+      limit?: number;
     },
     { rejectWithValue }
   ) => {
     try {
-      const response = await usersService.searchUsers(q, field, fields);
-      return response.data;
+      const response = await usersService.searchUsers(
+        q,
+        field,
+        fields,
+        page,
+        limit
+      );
+      return response.data; // should be { data, total, page, limit }
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Failed to search users");
     }
@@ -29,6 +40,9 @@ const usersSlice = createSlice({
   name: "users",
   initialState: {
     users: [] as any[],
+    total: 0,
+    page: 1,
+    limit: 10,
     selectedUser: null as any,
     loading: false,
     error: null as string | null,
@@ -48,9 +62,12 @@ const usersSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(searchUsers.fulfilled, (state: any, action) => {
+      .addCase(searchUsers.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.users = action.payload;
+        state.users = action.payload.data;
+        state.total = action.payload.total;
+        state.page = action.payload.page;
+        state.limit = action.payload.limit;
       })
       .addCase(searchUsers.rejected, (state, action) => {
         state.loading = false;

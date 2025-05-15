@@ -3,15 +3,31 @@ import { chatService } from "../../api/axiosInstance";
 import { SOCKET_ACTIONS } from "../../api/socket";
 import type { ChatState, ParticipantUser, PrivacySettings } from "../../types";
 
-// Async thunks
 export const fetchChats = createAsyncThunk(
   "chats/fetchChats",
-  async (_, { rejectWithValue }) => {
+  async (
+    {
+      page = 1,
+      limit = 10,
+      includeArchived = false,
+    }: { page?: number; limit?: number; includeArchived?: boolean },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await chatService.getChats();
-      return response.data;
+      const skip = (page - 1) * limit;
+      const response = await chatService.getChats({
+        skip,
+        limit,
+        includeArchived,
+      });
+      return {
+        chats: response.data.chats || response.data,
+        total: response.data.total || response.data.length,
+        page,
+        limit,
+      };
     } catch (error: any) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || "Failed to fetch chats");
     }
   }
 );
@@ -122,6 +138,9 @@ const initialState: ChatState = {
   loading: false,
   error: null,
   userStatuses: {},
+  total: 0,
+  page: 1,
+  limit: 10,
 };
 
 // Slice
@@ -212,6 +231,9 @@ const chatSlice = createSlice({
         };
       }
     },
+    setPage: (state, action) => {
+      state.page = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -222,7 +244,10 @@ const chatSlice = createSlice({
       })
       .addCase(fetchChats.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.chats = action.payload;
+        state.chats = action.payload.chats;
+        state.total = action.payload.total;
+        state.page = action.payload.page;
+        state.limit = action.payload.limit;
       })
       .addCase(fetchChats.rejected, (state, action) => {
         state.loading = false;
@@ -244,6 +269,7 @@ const chatSlice = createSlice({
       // Create chat
       .addCase(createChat.fulfilled, (state, action: any) => {
         state.chats.unshift(action.payload);
+        state.total += 1;
       })
       // Update chat
       .addCase(updateChat.fulfilled, (state, action: any) => {
@@ -260,6 +286,7 @@ const chatSlice = createSlice({
       .addCase(deleteChat.fulfilled, (state, action) => {
         const chatId = action.payload;
         state.chats = state.chats.filter((chat) => chat._id !== chatId);
+        state.total -= 1;
 
         if (state.currentChat && state.currentChat._id === chatId) {
           state.currentChat = initCurrentChat;
@@ -278,6 +305,7 @@ export const {
   unarchiveChat,
   updateLastActivity,
   incrementMessageCount,
+  setPage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
