@@ -7,6 +7,7 @@ import {
   setPage,
 } from "../../../store/slices/chatSlice";
 import type { Chat } from "../../../types";
+import { setSelectedUser } from "../../../store/slices/usersSlice";
 
 type SideBarProp = {
   closeSidebar: () => void;
@@ -27,6 +28,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
 
   const handleChatSelection = (chat: Chat) => {
     dispatch(setCurrentChat(chat));
+    dispatch(setSelectedUser(chat.otherParticipant));
     closeSidebar();
   };
 
@@ -76,7 +78,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                       {chat.otherParticipant?.username}
                     </span>
                     <p className="text-xs text-gray-500 truncate max-w-[160px]">
-                      {chat?.lastMessage || "No messages yet"}
+                      {/* {chat?.lastMessage || "No messages yet"} */}
                     </p>
                   </div>
                 </div>
@@ -98,7 +100,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
 
       {/* Pagination */}
       {!loading && chats.length > 0 && (
-        <div className="sticky bottom-0 z-10 border-t border-gray-200 bg-white px-4 py-1 shadow-md">
+        <div className="sticky bottom-0 z-10 bg-white px-4 py-1 pb-4 shadow-md">
           <div className="flex justify-center items-center max-w-md mx-auto">
             <div className="flex justify-center items-center space-x-2">
               <button

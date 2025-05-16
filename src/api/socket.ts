@@ -8,16 +8,17 @@ const socket = io("http://localhost:3000/chat", {
 
 // Socket events
 export const SOCKET_EVENTS = {
-  CONNECT: "connect",
-  DISCONNECT: "disconnect",
-  ERROR: "error",
-  NEW_MESSAGE: "new_message",
+  CONNECT: "CONNECT",
+  DISCONNECT: "DISCONNECT",
+  ERROR: "ERROR",
+  NEW_MESSAGE: "NEW_MESSAGE",
   MESSAGE_READ: "message_read",
   USER_TYPING: "user_typing",
   USER_ONLINE: "user_online",
   USER_OFFLINE: "user_offline",
   JOIN_CHAT: "join_chat",
   LEAVE_CHAT: "leave_chat",
+  RECEIVE_MESSAGE: "RECEIVE_MESSAGE",
 };
 
 // Socket actions

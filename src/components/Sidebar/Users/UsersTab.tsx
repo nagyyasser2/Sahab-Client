@@ -113,7 +113,7 @@ const UsersTab = ({ closeSidebar }: SideBarProp) => {
 
       {/* Fixed Pagination */}
       {!loading && users.length > 0 && (
-        <div className="sticky bottom-0 z-10 border-t border-gray-200 bg-white px-4 py-1 shadow-md">
+        <div className="sticky bottom-0 z-10 bg-white px-4 py-1 pb-4 shadow-md">
           <div className="flex justify-center items-center max-w-md mx-auto">
             <div className="flex justify-center items-center space-x-2">
               <button

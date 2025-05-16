@@ -104,9 +104,10 @@ export const chatService = {
 };
 
 export const messageService = {
-  getMessages: (chatId: any) => axiosInstance.get(`/chats/${chatId}/messages`),
+  getMessages: (chatId: any, receiverId: any) =>
+    axiosInstance.get(`/chats/${chatId}/messages/${receiverId}`),
   sendMessage: (chatId: any, data: any) =>
-    axiosInstance.post(`/chats/${chatId}/messages`, data),
+    axiosInstance.post(`/chats/message`, data),
   updateMessage: (id: any, data: any) =>
     axiosInstance.put(`/messages/${id}`, data),
   deleteMessage: (id: any) => axiosInstance.delete(`/messages/${id}`),

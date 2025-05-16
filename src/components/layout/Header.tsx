@@ -7,7 +7,7 @@ type HeaderProps = {
 
 const Header = ({ currentChat, toggleSidebar }: HeaderProps) => {
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4">
+    <header className="h-16 bg-white  flex items-center px-4">
       {/* Menu icon for mobile, visible only on small screens */}
       {toggleSidebar && (
         <button

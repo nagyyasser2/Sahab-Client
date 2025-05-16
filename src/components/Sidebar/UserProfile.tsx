@@ -150,7 +150,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     <div className="relative bg-white shadow-sm">
       {/* Menu button */}
       <div
-        className="w-full flex items-center justify-between px-2 py-2 text-gray-600 bg-gray-100 hover:bg-gray-150  transition-all duration-200"
+        className="w-full flex items-center justify-between px-2 py-2 text-gray-600 hover:bg-gray-150  transition-all duration-200"
         aria-label="Toggle profile menu"
         aria-expanded={isExpanded}
       >

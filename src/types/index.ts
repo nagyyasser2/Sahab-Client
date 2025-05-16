@@ -5,14 +5,26 @@ export interface User {
   email?: string;
 }
 
+export interface MessageContent {
+  text: string;
+}
+
+export enum MessageStatus {
+  Seen = 1,
+  Send = 2,
+  Delivered = 3,
+}
+
 export interface Message {
-  id: string;
-  chatId: string;
+  _id: string;
+  conversationId: string;
   senderId: string;
-  content: string;
-  readBy?: string[];
+  content: MessageContent;
+  type: string;
+  status: MessageStatus;
+  reactions: string[];
   createdAt: Date;
-  isDeleted?: boolean;
+  isDeleted: boolean;
 }
 
 export interface AuthState {

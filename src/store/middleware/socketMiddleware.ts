@@ -1,10 +1,16 @@
-import { addMessage, markAsRead, setTyping } from "../slices/messageSlice";
 import { updateUserStatus } from "../slices/chatSlice";
 import socket, { SOCKET_ACTIONS, SOCKET_EVENTS } from "../../api/socket";
+import {
+  type Dispatch,
+  type Middleware,
+  type MiddlewareAPI,
+} from "@reduxjs/toolkit";
+import type { RootState } from "../../types";
+import { addMessage, markAsRead, setTyping } from "../slices/messageSlice";
 
 // Socket middleware to handle socket events and dispatch Redux actions
-const socketMiddleware = () => {
-  return (store: any) => {
+const socketMiddleware = (): Middleware<{}, RootState> => {
+  return (store: MiddlewareAPI<Dispatch, RootState>) => {
     // Setup socket event listeners
     socket.on(SOCKET_EVENTS.CONNECT, () => {
       console.log("Socket connected");
@@ -19,7 +25,7 @@ const socketMiddleware = () => {
     });
 
     // Listen for incoming messages
-    socket.on(SOCKET_EVENTS.NEW_MESSAGE, (message) => {
+    socket.on(SOCKET_EVENTS.RECEIVE_MESSAGE, (message) => {
       store.dispatch(addMessage(message));
     });
 
@@ -43,30 +49,17 @@ const socketMiddleware = () => {
     });
 
     // The actual middleware
-    return (next: any) => (action: any) => {
-      // Check if action is a socket action
-      if (action.socket) {
-        const { event, data } = action.socket;
+    return (next) => (action: any) => {
+      // Check if the action is intended for socket emission
+      if (action.type === "socket/SEND_MESSAGE") {
+        const { event, data } = action.payload;
+        socket.emit(event, data);
+      }
 
-        switch (event) {
-          case SOCKET_ACTIONS.SEND_MESSAGE:
-            socket.emit(SOCKET_ACTIONS.SEND_MESSAGE, data);
-            break;
-          case SOCKET_ACTIONS.MARK_READ:
-            socket.emit(SOCKET_ACTIONS.MARK_READ, data);
-            break;
-          case SOCKET_ACTIONS.TYPING:
-            socket.emit(SOCKET_ACTIONS.TYPING, data);
-            break;
-          case SOCKET_ACTIONS.JOIN_CHAT:
-            socket.emit(SOCKET_ACTIONS.JOIN_CHAT, data);
-            break;
-          case SOCKET_ACTIONS.LEAVE_CHAT:
-            socket.emit(SOCKET_ACTIONS.LEAVE_CHAT, data);
-            break;
-          default:
-            break;
-        }
+      // Handle different socket action types
+      if (action.type === "socket/EMIT") {
+        const { event, data } = action.payload;
+        socket.emit(event, data);
       }
 
       // Continue to the next middleware
@@ -74,5 +67,11 @@ const socketMiddleware = () => {
     };
   };
 };
+
+// Action creator for socket emissions
+export const emitSocketAction = (event: string, data: any) => ({
+  type: "socket/EMIT",
+  payload: { event, data },
+});
 
 export default socketMiddleware;
