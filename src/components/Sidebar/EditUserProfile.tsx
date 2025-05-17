@@ -53,7 +53,7 @@ export const EditUserProfile: React.FC<EditUserProfileProps> = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {},
   } = useForm({
     defaultValues: {
       username: user.username || "",

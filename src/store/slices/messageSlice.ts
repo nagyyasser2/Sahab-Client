@@ -54,7 +54,8 @@ export const sendMessage = createAsyncThunk<
   ) => {
     try {
       // Send via REST API
-      const response = await messageService.sendMessage(chatId, {
+      const response = await messageService.sendMessage({
+        chatId,
         content,
         receiverId,
       });
@@ -122,7 +123,7 @@ const messagesSlice = createSlice({
         userId: string;
       }>
     ) => {
-      const { chatId, messageId, userId } = action.payload;
+      const { chatId, messageId } = action.payload;
 
       if (state.messagesByChatId[chatId]) {
         state.messagesByChatId[chatId] = state.messagesByChatId[chatId].map(

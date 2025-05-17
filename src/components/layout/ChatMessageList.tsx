@@ -99,11 +99,9 @@ const ChatMessageList = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
-      {/* Chat header */}
-
+    <div className="flex flex-col h-full overflow-hidden bg-white">
       {/* Messages area */}
-      <div className="flex-1 p-1 overflow-y-auto">
+      <div className="flex-1 px-3 py-2 overflow-y-auto scrollbar-hide">
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -154,4 +152,43 @@ const ChatMessageList = ({
   );
 };
 
-export default ChatMessageList;
+// Add CSS to hide scrollbar
+const styles = `
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+`;
+
+// Add the styles to the document
+const StyleTag = () => {
+  useEffect(() => {
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = styles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
+  return null;
+};
+
+// Modified export to include the style component
+const ChatMessageListWithHiddenScrollbar = (props: any) => {
+  return (
+    <>
+      <StyleTag />
+      <ChatMessageList {...props} />
+    </>
+  );
+};
+
+export default ChatMessageListWithHiddenScrollbar;

@@ -2,9 +2,10 @@ import {
   IoChatbubbleEllipsesOutline,
   IoLocationOutline,
 } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../store";
 import { createChat, setCurrentChat } from "../../../store/slices/chatSlice";
+import { setSelectedUser } from "../../../store/slices/usersSlice";
 
 const getStatusColor = (status: any) => {
   switch (status) {
@@ -28,13 +29,13 @@ const UserItem = ({
   closeSidebar,
 }: any) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user: currentUser } = useSelector((state: any) => state.auth);
-
   // Handle user selection - either use existing chat or create a new one
+  // here..................................
   const handleUserSelected = () => {
     if (hasExistingChat && existingChat) {
       // Simply set the existing chat as current
       dispatch(setCurrentChat(existingChat));
+      dispatch(setSelectedUser(existingChat.otherParticipant));
     } else {
       // Create a new direct chat with this user
       const chatData: any = {
@@ -59,21 +60,12 @@ const UserItem = ({
           // Check if the action was fulfilled
           if (createChat.fulfilled.match(result)) {
             dispatch(setCurrentChat(result.payload));
+            dispatch(setSelectedUser(result.payload?.otherParticipant));
           }
         })
         .catch((error: any) => {
           console.error("Failed to create chat:", error);
         });
-
-      // Alternative method 2 (uncomment if you prefer this approach):
-      /*
-      // Using the createAsyncThunk API correctly
-      void dispatch(createChat(chatData)).then((result) => {
-        if (result.meta.requestStatus === 'fulfilled') {
-          dispatch(setCurrentChat(result.payload));
-        }
-      });
-      */
     }
     closeSidebar();
   };

@@ -10,9 +10,7 @@ type ChatSectionProp = {
 };
 
 const ChatSection = ({ toggleSidebar }: ChatSectionProp) => {
-  const { currentChat, loading, error } = useSelector(
-    (state: any) => state.chats
-  );
+  const { currentChat } = useSelector((state: any) => state.chats);
 
   const user: any = useCurrentUser();
 
@@ -23,7 +21,7 @@ const ChatSection = ({ toggleSidebar }: ChatSectionProp) => {
   return (
     <main className="flex-1 flex flex-col w-full">
       <Header toggleSidebar={toggleSidebar} currentChat={currentChat} />
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto px-0">
         <ChatMessageList currentChat={currentChat} currentUser={user} />
       </div>
       <ChatInput currentChat={currentChat} currentUser={user} />

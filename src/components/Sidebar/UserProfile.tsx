@@ -67,6 +67,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     if (!isLoggingOut) {
       setIsModalOpen(false);
     }
+    window.location.reload();
   }, [isLoggingOut]);
 
   const handleOpenEditProfile = useCallback(() => {
@@ -75,26 +76,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const handleCloseEditProfile = useCallback(() => {
     setIsEditProfileOpen(false);
-  }, []);
-
-  const handleSaveProfile = useCallback(async (userData: any) => {
-    // Here you would implement the API call to update the user profile
-    // For example:
-    // await userApi.updateProfile(userData);
-
-    // Close the modal after successful update
-    setIsEditProfileOpen(false);
-  }, []);
-
-  const handleUpdateProfilePicture = useCallback(async (file: File) => {
-    // Here you would implement the API call to update just the profile picture
-    // For example:
-    // const formData = new FormData();
-    // formData.append('profilePic', file);
-    // await userApi.updateProfilePicture(formData);
-
-    console.log("Updating profile picture:", file.name);
-    // You might want to update the user state here to reflect the new picture
   }, []);
 
   const toggleExpand = useCallback(() => {
@@ -123,7 +104,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
         onLogoutSuccess();
       }
 
+      // Refresh the page to ensure all state is cleared and UI is reset
+      window.location.reload();
+
       // Short delay before navigation to ensure state updates complete
+      // This will only run if the reload doesn't happen for some reason
       setTimeout(() => {
         navigate("/auth", { replace: true });
       }, 100);

@@ -1,5 +1,5 @@
 import { updateUserStatus } from "../slices/chatSlice";
-import socket, { SOCKET_ACTIONS, SOCKET_EVENTS } from "../../api/socket";
+import socket, { SOCKET_EVENTS } from "../../api/socket";
 import {
   type Dispatch,
   type Middleware,

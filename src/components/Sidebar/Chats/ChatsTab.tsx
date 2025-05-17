@@ -26,6 +26,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
 
   const totalPages = Math.ceil(total / limit);
 
+  // here...
   const handleChatSelection = (chat: Chat) => {
     dispatch(setCurrentChat(chat));
     dispatch(setSelectedUser(chat.otherParticipant));

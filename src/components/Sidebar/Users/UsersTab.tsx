@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchUsersForm from "../SearchUsersForm";
 import UserItem from "./UserItem";
 import { useCurrentUser } from "../../../features/auth/authHooks";
