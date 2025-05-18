@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { RefreshTokenResponse } from "../features/auth/authTypes";
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "http://10.10.4.26:3000";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -104,8 +104,29 @@ export const chatService = {
 };
 
 export const messageService = {
-  getMessages: (chatId: any, receiverId: any) =>
-    axiosInstance.get(`/chats/${chatId}/messages/${receiverId}`),
+  getMessages: (
+    chatId: any,
+    receiverId: any,
+    skip?: number,
+    limit?: number
+  ) => {
+    // Build the query parameters if skip and limit are provided
+    let url = `/chats/${chatId}/messages/${receiverId}`;
+
+    // Add pagination parameters if they exist
+    if (skip !== undefined || limit !== undefined) {
+      const params = new URLSearchParams();
+      if (skip !== undefined) params.append("skip", skip.toString());
+      if (limit !== undefined) params.append("limit", limit.toString());
+
+      // Append query string if we have parameters
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+    }
+
+    return axiosInstance.get(url);
+  },
   sendMessage: (data: any) => axiosInstance.post(`/chats/message`, data),
   updateMessage: (id: any, data: any) =>
     axiosInstance.put(`/messages/${id}`, data),

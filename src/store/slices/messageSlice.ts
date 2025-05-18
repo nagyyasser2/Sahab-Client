@@ -26,13 +26,21 @@ const initialState: MessagesState = {
 // Async thunks
 export const fetchMessages = createAsyncThunk<
   { chatId: string; messages: Message[] }, // Return type
-  { chatId: string; receiverId: string }, // Payload type
+  { chatId: string; receiverId: string; skip?: number; limit?: number }, // Payload type
   { rejectValue: string } // ThunkAPI config
 >(
   "messages/fetchMessages",
-  async ({ chatId, receiverId }, { rejectWithValue }: any) => {
+  async (
+    { chatId, receiverId, skip = 0, limit = 20 },
+    { rejectWithValue }: any
+  ) => {
     try {
-      const response = await messageService.getMessages(chatId, receiverId);
+      const response = await messageService.getMessages(
+        chatId,
+        receiverId,
+        skip,
+        limit
+      );
       return { chatId, messages: response.data };
     } catch (error: any) {
       return rejectWithValue(
@@ -114,6 +122,30 @@ const messagesSlice = createSlice({
       }
     },
 
+    // Add older messages (for pagination)
+    addOlderMessages: (
+      state,
+      action: PayloadAction<{ chatId: string; messages: Message[] }>
+    ) => {
+      const { chatId, messages } = action.payload;
+
+      if (!state.messagesByChatId[chatId]) {
+        state.messagesByChatId[chatId] = [];
+      }
+
+      // Filter out any messages that already exist in the state
+      const uniqueMessages = messages.filter(
+        (message) =>
+          !state.messagesByChatId[chatId].some((m) => m._id === message._id)
+      );
+
+      // Add older messages to the beginning of the array
+      state.messagesByChatId[chatId] = [
+        ...uniqueMessages,
+        ...state.messagesByChatId[chatId],
+      ];
+    },
+
     // Mark message as read
     markAsRead: (
       state,
@@ -190,7 +222,26 @@ const messagesSlice = createSlice({
       .addCase(fetchMessages.fulfilled, (state, action) => {
         const { chatId, messages } = action.payload;
         state.loading = false;
-        state.messagesByChatId[chatId] = messages;
+
+        // If this is the initial fetch (not pagination), replace all messages
+        if (
+          !state.messagesByChatId[chatId] ||
+          state.messagesByChatId[chatId].length === 0
+        ) {
+          state.messagesByChatId[chatId] = messages;
+        } else {
+          // This is a pagination request, add older messages to the beginning
+          // Filter out any messages that already exist in the state
+          const uniqueMessages = messages.filter(
+            (message) =>
+              !state.messagesByChatId[chatId].some((m) => m._id === message._id)
+          );
+
+          state.messagesByChatId[chatId] = [
+            ...uniqueMessages,
+            ...state.messagesByChatId[chatId],
+          ];
+        }
       })
       .addCase(fetchMessages.rejected, (state, action: any) => {
         state.loading = false;
@@ -230,6 +281,7 @@ export const selectMessagesByChatId = (
 
 export const {
   addMessage,
+  addOlderMessages,
   markAsRead,
   setTyping,
   clearTypingForChat,

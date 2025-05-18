@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 
 // Initialize socket connection
-const socket = io("http://localhost:3000/chat", {
+const socket = io("http://10.10.4.26:3000/chat", {
   autoConnect: false,
   reconnection: true,
 });
