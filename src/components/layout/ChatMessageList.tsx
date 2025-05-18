@@ -78,8 +78,25 @@ const ChatMessageList = ({
     try {
       const currentMessageCount = messages.length;
       const container = messagesContainerRef.current;
-      const scrollHeight = container?.scrollHeight || 0;
-      const scrollTop = container?.scrollTop || 0;
+
+      if (!container) return;
+
+      // Store the first visible message element before loading new messages
+      const containerTop = container.getBoundingClientRect().top;
+
+      // Find the first visible message element (the one that was at the top)
+      let firstVisibleMessage = null;
+      const messageElements = container.querySelectorAll("[data-message-id]");
+
+      for (const element of messageElements) {
+        const elementRect = element.getBoundingClientRect();
+        const relativeTop = elementRect.top - containerTop;
+
+        if (relativeTop >= 0) {
+          firstVisibleMessage = element;
+          break;
+        }
+      }
 
       const result = await dispatch(
         fetchMessages({
@@ -90,13 +107,40 @@ const ChatMessageList = ({
         }) as any
       ).unwrap();
 
-      // Wait for DOM update before adjusting scroll
+      // Wait for DOM update, then position to show some new messages + the previous top message
       setTimeout(() => {
-        if (container) {
-          const newScrollHeight = container.scrollHeight;
-          container.scrollTop = scrollTop + (newScrollHeight - scrollHeight);
+        if (container && firstVisibleMessage && result.messages.length > 0) {
+          // Find the same message element after new messages are loaded
+          const messageId = firstVisibleMessage.getAttribute("data-message-id");
+          const updatedMessageElement = container.querySelector(
+            `[data-message-id="${messageId}"]`
+          );
+
+          if (updatedMessageElement) {
+            // Get all message elements to find newly loaded ones
+            const allMessageElements =
+              container.querySelectorAll("[data-message-id]");
+            const messageArray = Array.from(allMessageElements);
+            const targetMessageIndex = messageArray.findIndex(
+              (el) => el.getAttribute("data-message-id") === messageId
+            );
+
+            // Show 2-3 messages before the target message (newly loaded ones)
+            const messagesToShowBefore = Math.min(3, targetMessageIndex);
+            const scrollTargetIndex = Math.max(
+              0,
+              targetMessageIndex - messagesToShowBefore
+            );
+            const scrollTargetElement: any = messageArray[scrollTargetIndex];
+
+            if (scrollTargetElement) {
+              // Scroll to show the target element with some padding
+              const elementTop = scrollTargetElement.offsetTop;
+              container.scrollTop = Math.max(0, elementTop - 20); // 20px padding from top
+            }
+          }
         }
-      }, 0);
+      }, 50);
 
       setHasMoreMessages(result.messages.length >= MESSAGES_PER_PAGE);
     } catch (error) {
@@ -261,6 +305,7 @@ const ChatMessageList = ({
               return (
                 <div
                   key={message._id}
+                  data-message-id={message._id}
                   className={`flex ${
                     isMyMessage ? "justify-end" : "justify-start"
                   }`}
