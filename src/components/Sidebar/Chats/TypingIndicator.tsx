@@ -18,7 +18,7 @@ const TypingIndicator = ({ chatId, className = "" }: TypingIndicatorProps) => {
 
   return (
     <div className={`flex items-center space-x-1 ${className}`}>
-      <span className="text-xs text-blue-500 font-medium">typing</span>
+      <span className="text-xs text-blue-500 font-medium"></span>
       <div className="flex space-x-1">
         <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
         <div

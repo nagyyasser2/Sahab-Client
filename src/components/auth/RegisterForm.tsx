@@ -62,18 +62,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   });
 
   const onSubmit = (data: RegisterFormValues) => {
-    // Remove confirmPassword before submitting
     const { confirmPassword, ...registrationData } = data;
 
-    // Format username if needed (ensuring it has @ prefix)
-    const formattedUsername = data.username.startsWith("@")
-      ? data.username
-      : `@${data.username}`;
-
-    register$.mutate({
-      ...registrationData,
-      username: formattedUsername,
-    });
+    register$.mutate(registrationData);
   };
 
   return (
@@ -92,18 +83,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         <FormInput
           label="Username"
           id="username"
-          prefix="@"
           error={errors.username}
-          {...register("username", {
-            ...usernameValidator,
-            // Remove @ if user types it
-            onChange: (e) => {
-              const value = e.target.value;
-              if (value.startsWith("@")) {
-                e.target.value = value.substring(1);
-              }
-            },
-          })}
+          {...register("username", usernameValidator)}
         />
 
         <FormInput

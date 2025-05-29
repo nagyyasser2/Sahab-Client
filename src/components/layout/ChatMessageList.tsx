@@ -7,7 +7,6 @@ import {
 } from "../../store/slices/messageSlice";
 import { emitSocketAction } from "../../store/middleware/socketMiddleware";
 import { SOCKET_ACTIONS } from "../../api/socket";
-import type { RootState } from "../../store";
 import { MessageStatus, type Message } from "../../types";
 
 type ChatMessageListProps = {
@@ -34,7 +33,7 @@ const ChatMessageList = ({
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
 
-  const messages = useSelector((state: RootState) =>
+  const messages = useSelector((state: any) =>
     selectMessagesByChatId(state, currentChat._id)
   );
 

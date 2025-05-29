@@ -12,7 +12,7 @@ export const SOCKET_EVENTS = {
   DISCONNECT: "DISCONNECT",
   ERROR: "ERROR",
   NEW_MESSAGE: "NEW_MESSAGE",
-  MESSAGE_READ: "message_read",
+  MESSAGES_READ: "messages_read",
   USER_TYPING: "user_typing",
   USER_ONLINE: "user_online",
   USER_OFFLINE: "user_offline",
@@ -20,6 +20,8 @@ export const SOCKET_EVENTS = {
   LEAVE_CHAT: "leave_chat",
   RECEIVE_MESSAGE: "RECEIVE_MESSAGE",
   TYPING: "typing",
+  USER_STATUS_UPDATE: "user_status_update",
+  USER_STATUS_CHECK: "user_status_check",
 };
 
 // Socket actions

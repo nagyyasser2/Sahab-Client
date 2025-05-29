@@ -11,9 +11,6 @@ export const authApi = {
     // Ensure username has @ prefix
     const formattedData = {
       ...data,
-      username: data.username.startsWith("@")
-        ? data.username
-        : `@${data.username}`,
     };
 
     const response = await axiosInstance.post<AuthResponse>(

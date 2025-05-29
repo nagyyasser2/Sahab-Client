@@ -34,7 +34,7 @@ const socketMiddleware = (): Middleware<{}, RootState> => {
     });
 
     // Listen for message read events
-    socket.on(SOCKET_EVENTS.MESSAGE_READ, ({ chatId, messageId, userId }) => {
+    socket.on(SOCKET_EVENTS.MESSAGES_READ, ({ chatId, messageId, userId }) => {
       store.dispatch(markAsRead({ chatId, messageId, userId }));
     });
 
@@ -44,12 +44,8 @@ const socketMiddleware = (): Middleware<{}, RootState> => {
     });
 
     // Listen for user online/offline status
-    socket.on(SOCKET_EVENTS.USER_ONLINE, (userId) => {
-      store.dispatch(updateUserStatus({ userId, status: "online" }));
-    });
-
-    socket.on(SOCKET_EVENTS.USER_OFFLINE, (userId) => {
-      store.dispatch(updateUserStatus({ userId, status: "offline" }));
+    socket.on(SOCKET_EVENTS.USER_STATUS_UPDATE, ({ userId, status }) => {
+      store.dispatch(updateUserStatus({ userId, status: status }));
     });
 
     // The actual middleware
