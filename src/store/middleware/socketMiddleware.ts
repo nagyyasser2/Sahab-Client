@@ -6,7 +6,11 @@ import {
   type MiddlewareAPI,
 } from "@reduxjs/toolkit";
 import type { RootState } from "../../types";
-import { addMessage, markAsRead, setTyping } from "../slices/messageSlice";
+import {
+  addMessage,
+  markAsRead,
+  setTypingStatus,
+} from "../slices/messageSlice";
 
 // Socket middleware to handle socket events and dispatch Redux actions
 const socketMiddleware = (): Middleware<{}, RootState> => {
@@ -34,9 +38,9 @@ const socketMiddleware = (): Middleware<{}, RootState> => {
       store.dispatch(markAsRead({ chatId, messageId, userId }));
     });
 
-    // Listen for typing events
-    socket.on(SOCKET_EVENTS.USER_TYPING, ({ chatId, userId, isTyping }) => {
-      store.dispatch(setTyping({ chatId, userId, isTyping }));
+    // Listen for typing events - simplified to only need chatId and isTyping
+    socket.on(SOCKET_EVENTS.TYPING, ({ chatId, isTyping }) => {
+      store.dispatch(setTypingStatus({ chatId, isTyping }));
     });
 
     // Listen for user online/offline status

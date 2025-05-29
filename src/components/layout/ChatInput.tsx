@@ -3,22 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { sendMessage } from "../../store/slices/messageSlice";
 import { emitSocketAction } from "../../store/middleware/socketMiddleware";
 import { SOCKET_ACTIONS } from "../../api/socket";
+import type { ParticipantUser } from "../../types";
 
 type ChatInputProps = {
   currentChat: {
     _id: string;
-  };
-  currentUser: {
-    _id: string;
+    otherParticipant: ParticipantUser;
   };
 };
 
-const ChatInput = ({ currentChat, currentUser }: ChatInputProps) => {
+const ChatInput = ({ currentChat }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<any>(null);
   const dispatch = useDispatch();
   const selectedUser = useSelector((state: any) => state.users.selectedUser);
+
   // Handle sending messages
   const handleSendMessage = (e?: FormEvent) => {
     if (e) e.preventDefault();
@@ -49,17 +49,18 @@ const ChatInput = ({ currentChat, currentUser }: ChatInputProps) => {
     }
   };
 
-  // Handle typing status
+  // Handle typing status - simplified to only send chatId and isTyping
   const handleTyping = () => {
     if (!isTyping) {
       setIsTyping(true);
       dispatch(
         emitSocketAction(SOCKET_ACTIONS.TYPING, {
           chatId: currentChat._id,
-          userId: currentUser._id,
+          receiverId: currentChat.otherParticipant._id,
           isTyping: true,
         }) as any
       );
+      console.log("fuck");
     }
 
     // Clear existing timeout
@@ -72,14 +73,14 @@ const ChatInput = ({ currentChat, currentUser }: ChatInputProps) => {
     setTypingTimeout(timeout);
   };
 
-  // Stop typing indicator
+  // Stop typing indicator - simplified to only send chatId and isTyping
   const handleStopTyping = () => {
     if (isTyping) {
       setIsTyping(false);
       dispatch(
         emitSocketAction(SOCKET_ACTIONS.TYPING, {
           chatId: currentChat._id,
-          userId: currentUser._id,
+          receiverId: currentChat.otherParticipant._id,
           isTyping: false,
         }) as any
       );
@@ -92,7 +93,7 @@ const ChatInput = ({ currentChat, currentUser }: ChatInputProps) => {
   };
 
   return (
-    <footer className="h-15  p-2 bg-white">
+    <footer className="h-15 p-2 bg-white">
       <form
         onSubmit={handleSendMessage}
         className="flex items-center space-x-2"

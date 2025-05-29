@@ -1,4 +1,5 @@
 import { CiMenuFries } from "react-icons/ci";
+import TypingIndicator from "../Sidebar/Chats/TypingIndicator";
 
 type HeaderProps = {
   currentChat: any;
@@ -27,9 +28,12 @@ const Header = ({ currentChat, toggleSidebar }: HeaderProps) => {
           alt={currentChat.otherParticipant?.username}
           className="w-10 h-10 rounded-full object-cover"
         />
-        <span className="text-xl font-semibold">
-          {currentChat?.otherParticipant.username}
-        </span>
+        <div className="flex flex-col">
+          <span className="text-xl font-semibold">
+            {currentChat?.otherParticipant.username}
+          </span>
+          <TypingIndicator chatId={currentChat._id} />
+        </div>
       </div>
     </header>
   );

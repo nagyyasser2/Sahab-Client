@@ -8,6 +8,7 @@ import {
 } from "../../../store/slices/chatSlice";
 import type { Chat } from "../../../types";
 import { setSelectedUser } from "../../../store/slices/usersSlice";
+import TypingIndicator from "./TypingIndicator"; // Import the new component
 
 type SideBarProp = {
   closeSidebar: () => void;
@@ -26,7 +27,6 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
 
   const totalPages = Math.ceil(total / limit);
 
-  // here...
   const handleChatSelection = (chat: Chat) => {
     dispatch(setCurrentChat(chat));
     dispatch(setSelectedUser(chat.otherParticipant));
@@ -74,13 +74,18 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                     alt="Profile"
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <div>
-                    <span className="font-medium">
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium block">
                       {chat.otherParticipant?.username}
                     </span>
-                    <p className="text-xs text-gray-500 truncate max-w-[160px]">
-                      {/* {chat?.lastMessage || "No messages yet"} */}
-                    </p>
+                    {/* Show typing indicator or last message */}
+                    <div className="flex items-center min-h-[16px]">
+                      <TypingIndicator chatId={chat._id} />
+                      {/* You can add last message display here when not typing */}
+                      {/* <p className="text-xs text-gray-500 truncate max-w-[160px]">
+                        {chat?.lastMessage || "No messages yet"}
+                      </p> */}
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">

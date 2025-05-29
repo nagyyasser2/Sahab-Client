@@ -19,6 +19,7 @@ export const SOCKET_EVENTS = {
   JOIN_CHAT: "join_chat",
   LEAVE_CHAT: "leave_chat",
   RECEIVE_MESSAGE: "RECEIVE_MESSAGE",
+  TYPING: "typing",
 };
 
 // Socket actions

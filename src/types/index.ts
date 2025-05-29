@@ -36,6 +36,7 @@ export interface AuthState {
 }
 
 export interface MessageState {
+  typingChats: any;
   messagesByChatId: Record<string, Message[]>;
   loading: boolean;
   error: string | null;

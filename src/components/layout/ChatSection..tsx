@@ -24,7 +24,7 @@ const ChatSection = ({ toggleSidebar }: ChatSectionProp) => {
       <div className="flex-1 overflow-y-auto px-0">
         <ChatMessageList currentChat={currentChat} currentUser={user} />
       </div>
-      <ChatInput currentChat={currentChat} currentUser={user} />
+      <ChatInput currentChat={currentChat} />
     </main>
   );
 };

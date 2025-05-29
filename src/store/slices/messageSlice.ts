@@ -12,7 +12,7 @@ interface MessagesState {
   messagesByChatId: { [chatId: string]: Message[] };
   loading: boolean;
   error: string | null;
-  typingUsers: { [chatId: string]: string[] };
+  typingChats: { [chatId: string]: boolean }; // Simplified: just track if someone is typing in this chat
 }
 
 // Initial state
@@ -20,7 +20,7 @@ const initialState: MessagesState = {
   messagesByChatId: {},
   loading: false,
   error: null,
-  typingUsers: {},
+  typingChats: {},
 };
 
 // Async thunks
@@ -172,38 +172,22 @@ const messagesSlice = createSlice({
       }
     },
 
-    // Update typing status
-    setTyping: (
+    // Simplified typing status - just set true/false for the chat
+    setTypingStatus: (
       state,
       action: PayloadAction<{
         chatId: string;
-        userId: string;
         isTyping: boolean;
       }>
     ) => {
-      const { chatId, userId, isTyping } = action.payload;
-
-      if (!state.typingUsers[chatId]) {
-        state.typingUsers[chatId] = [];
-      }
-
-      if (isTyping) {
-        // Add user to typing list if not already there
-        if (!state.typingUsers[chatId].includes(userId)) {
-          state.typingUsers[chatId].push(userId);
-        }
-      } else {
-        // Remove user from typing list
-        state.typingUsers[chatId] = state.typingUsers[chatId].filter(
-          (id) => id !== userId
-        );
-      }
+      const { chatId, isTyping } = action.payload;
+      state.typingChats[chatId] = isTyping;
     },
 
     // Clear typing status for a chat
     clearTypingForChat: (state, action: PayloadAction<string>) => {
       const chatId = action.payload;
-      state.typingUsers[chatId] = [];
+      state.typingChats[chatId] = false;
     },
 
     // Clear messages for a specific chat
@@ -272,6 +256,7 @@ const messagesSlice = createSlice({
   },
 });
 
+// Selectors
 export const selectMessagesByChatId = (
   state: RootState,
   chatId: string
@@ -279,11 +264,15 @@ export const selectMessagesByChatId = (
   return state.messages.messagesByChatId[chatId] || [];
 };
 
+export const selectIsTyping = (state: RootState, chatId: string): boolean => {
+  return state.messages.typingChats[chatId] || false;
+};
+
 export const {
   addMessage,
   addOlderMessages,
   markAsRead,
-  setTyping,
+  setTypingStatus,
   clearTypingForChat,
   clearChatMessages,
 } = messagesSlice.actions;
