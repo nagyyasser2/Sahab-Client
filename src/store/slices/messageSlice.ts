@@ -56,10 +56,7 @@ export const sendMessage = createAsyncThunk<
   { rejectValue: string }
 >(
   "messages/sendMessage",
-  async (
-    { chatId, content, receiverId },
-    { dispatch, rejectWithValue }: any
-  ) => {
+  async ({ chatId, content, receiverId }, { rejectWithValue }: any) => {
     try {
       // Send via REST API
       const response = await messageService.sendMessage({
@@ -68,15 +65,6 @@ export const sendMessage = createAsyncThunk<
         receiverId,
       });
       const message = response.data;
-
-      // Also emit via socket for real-time updates
-      dispatch({
-        type: "socket/SEND_MESSAGE",
-        payload: {
-          event: SOCKET_ACTIONS.SEND_MESSAGE,
-          data: { chatId, message },
-        },
-      });
 
       return message;
     } catch (error: any) {
@@ -230,17 +218,6 @@ const messagesSlice = createSlice({
       .addCase(fetchMessages.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      // Send message
-      .addCase(sendMessage.fulfilled, (state, action) => {
-        const message = action.payload;
-        const chatId = message.conversationId;
-
-        if (!state.messagesByChatId[chatId]) {
-          state.messagesByChatId[chatId] = [];
-        }
-
-        state.messagesByChatId[chatId].push(message);
       })
       // Delete message
       .addCase(deleteMessage.fulfilled, (state, action) => {

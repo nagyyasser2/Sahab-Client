@@ -189,7 +189,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 <img
                   src={user.profilePic}
                   alt={`${user.username}'s profile`}
-                  className="w-full h-full object-cover border-3 border-blue-800 shadow-md shadow-blue-700 rounded-full"
+                  className="w-full h-full object-cover border-3 border-blue-500 shadow-md shadow-blue-500 rounded-full"
                   onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                     const img = e.currentTarget as HTMLImageElement;
                     img.style.display = "none";
@@ -211,11 +211,18 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 {user.username?.charAt(0)?.toUpperCase() || "?"}
               </div>
             </div>
-
+            <button
+              onClick={handleOpenEditProfile}
+              className="mt-2 cursor-pointer flex items-center gap-2 hover:text-gray-500 transition-all duration-200"
+            >
+              <FiEdit />
+              Edit
+            </button>
             {/* User Info */}
-            <h2 className="mt-4 text-xl font-semibold text-gray-800">
+            <h2 className="mt-4 text-xl font-semibold text-gray-800 underline">
               {user.username}
             </h2>
+
             {user.phoneNumber && (
               <div className="flex items-center">
                 <BiMobileAlt />
@@ -228,15 +235,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 <p className="text-sm text-gray-500">{user.country}</p>
               </div>
             )}
-            <button
-              onClick={handleOpenEditProfile}
-              className="mt-2 cursor-pointer flex items-center gap-2 hover:text-gray-500 transition-all duration-200"
-            >
-              <FiEdit />
-              <span>Edit</span>
-            </button>
 
-            {/* Logout button */}
             <button
               onClick={handleOpenModal}
               className="mt-1 flex items-center justify-center gap-2  bg-white px-4 py-2 rounded-md cursor-pointer transition-all duration-200  max-w-xs hover:text-gray-500"
@@ -248,7 +247,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
               ) : (
                 <>
                   <FiLogOut className="text-md" />
-                  <span>Logout</span>
+                  logout
                 </>
               )}
             </button>

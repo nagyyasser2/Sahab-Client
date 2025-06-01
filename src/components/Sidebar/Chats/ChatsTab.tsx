@@ -70,7 +70,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
               >
                 <div className="flex items-center space-x-2">
                   <img
-                    src={chat.otherParticipant.profilePic}
+                    src={chat.otherParticipant?.profilePic}
                     alt="Profile"
                     className="w-10 h-10 rounded-full object-cover"
                   />
@@ -78,14 +78,13 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                     <span className="font-medium block">
                       {chat.otherParticipant?.username}
                     </span>
-                    {/* Show typing indicator or last message */}
-                    <div className="flex items-center min-h-[16px]">
-                      <TypingIndicator chatId={chat._id} />
-                      {/* You can add last message display here when not typing */}
-                      {/* <p className="text-xs text-gray-500 truncate max-w-[160px]">
-                        {chat?.lastMessage || "No messages yet"}
-                      </p> */}
-                    </div>
+                    <span className="text-xs text-gray-500 truncate max-w-[160px]">
+                      <TypingIndicator
+                        chatId={chat._id}
+                        chat={chat}
+                        isHeader={false}
+                      />
+                    </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">

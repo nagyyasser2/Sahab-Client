@@ -238,6 +238,40 @@ const chatSlice = createSlice({
         };
       }
     },
+    // Add this reducer to your chatSlice reducers object
+    resetUnreadMessages: (state, action) => {
+      const chatId = action.payload;
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId ? { ...chat, unreadMessagesCount: 0 } : chat
+      );
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        state.currentChat = { ...state.currentChat, unreadMessagesCount: 0 };
+      }
+    },
+    incrementUnreadMessages: (state, action) => {
+      const { chatId } = action.payload;
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        return;
+      }
+
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId
+          ? { ...chat, unreadMessagesCount: chat.unreadMessagesCount + 1 }
+          : chat
+      );
+    },
+    updateLastMessage: (state, action) => {
+      const { chatId, message } = action.payload;
+      state.chats = state.chats.map((chat) =>
+        chat._id === chatId ? { ...chat, lastMessage: message } : chat
+      );
+
+      if (state.currentChat && state.currentChat._id === chatId) {
+        state.currentChat = { ...state.currentChat, lastMessage: message };
+      }
+    },
     setPage: (state, action) => {
       state.page = action.payload;
     },
@@ -274,10 +308,10 @@ const chatSlice = createSlice({
         state.error = action.payload || "Failed to fetch chat";
       })
       // Create chat
-      .addCase(createChat.fulfilled, (state, action: any) => {
-        state.chats.unshift(action.payload);
-        state.total += 1;
-      })
+      // .addCase(createChat.fulfilled, (state, action: any) => {
+      //   state.chats.unshift(action.payload);
+      //   state.total += 1;
+      // })
       // Update chat
       .addCase(updateChat.fulfilled, (state, action: any) => {
         const updatedChat = action.payload;
@@ -313,6 +347,9 @@ export const {
   updateLastActivity,
   incrementMessageCount,
   setPage,
+  resetUnreadMessages,
+  incrementUnreadMessages,
+  updateLastMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

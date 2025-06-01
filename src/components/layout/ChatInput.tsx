@@ -60,7 +60,6 @@ const ChatInput = ({ currentChat }: ChatInputProps) => {
           isTyping: true,
         }) as any
       );
-      console.log("fuck");
     }
 
     // Clear existing timeout

@@ -5,6 +5,7 @@ import {
   fetchMessages,
   selectMessagesByChatId,
 } from "../../store/slices/messageSlice";
+import { resetUnreadMessages } from "../../store/slices/chatSlice"; // Import the new action
 import { emitSocketAction } from "../../store/middleware/socketMiddleware";
 import { SOCKET_ACTIONS } from "../../api/socket";
 import { MessageStatus, type Message } from "../../types";
@@ -32,6 +33,7 @@ const ChatMessageList = ({
   const [messageCount, setMessageCount] = useState(0);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const [hasResetUnreadMessages, setHasResetUnreadMessages] = useState(false); // New state
 
   const messages = useSelector((state: any) =>
     selectMessagesByChatId(state, currentChat._id)
@@ -173,6 +175,7 @@ const ChatMessageList = ({
       setShouldAutoScroll(true);
       setIsInitialLoadComplete(false);
       setHasScrolledToBottom(false);
+      setHasResetUnreadMessages(false); // Reset this flag for new chat
 
       try {
         await dispatch(
@@ -232,6 +235,27 @@ const ChatMessageList = ({
     }
   }, [isInitialLoading, messages, hasScrolledToBottom, scrollToBottom]);
 
+  // Reset unread messages count after first render and initial load completion
+  useEffect(() => {
+    if (
+      !isInitialLoading &&
+      isInitialLoadComplete &&
+      hasScrolledToBottom &&
+      !hasResetUnreadMessages &&
+      currentChat._id
+    ) {
+      dispatch(resetUnreadMessages(currentChat._id));
+      setHasResetUnreadMessages(true);
+    }
+  }, [
+    isInitialLoading,
+    isInitialLoadComplete,
+    hasScrolledToBottom,
+    hasResetUnreadMessages,
+    currentChat._id,
+    dispatch,
+  ]);
+
   // Handle new message auto-scroll
   useEffect(() => {
     if (isInitialLoading || isLoadingMore || !messages || !hasScrolledToBottom)
@@ -260,7 +284,13 @@ const ChatMessageList = ({
 
   const formatTime = useCallback((timestamp: string | Date) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "narrow",
+      year: "2-digit",
+    });
   }, []);
 
   const sortedMessages = [...(messages || [])].sort(
@@ -310,13 +340,13 @@ const ChatMessageList = ({
                   }`}
                 >
                   <div
-                    className={`max-w-md px-4 py-2 rounded-xl shadow transition-all duration-200 hover:shadow-md ${
+                    className={`max-w-sm px-4 py-2 rounded-xl shadow transition-all duration-200 hover:shadow-md ${
                       isMyMessage
                         ? "bg-blue-500 text-white rounded-br-none"
                         : "bg-gray-100 text-gray-800 rounded-bl-none"
                     }`}
                   >
-                    <div className="text-sm leading-relaxed">
+                    <div className="text-sm leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere">
                       {message.content.text}
                     </div>
                     <div
@@ -325,16 +355,6 @@ const ChatMessageList = ({
                       }`}
                     >
                       <span>{formatTime(message.createdAt)}</span>
-                      {isMyMessage && (
-                        <>
-                          {message.status === MessageStatus.Seen && (
-                            <span className="text-green-300">✓✓</span>
-                          )}
-                          {message.status === MessageStatus.Delivered && (
-                            <span className="text-blue-200">✓</span>
-                          )}
-                        </>
-                      )}
                     </div>
                   </div>
                 </div>

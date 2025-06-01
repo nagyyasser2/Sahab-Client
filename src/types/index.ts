@@ -10,9 +10,9 @@ export interface MessageContent {
 }
 
 export enum MessageStatus {
-  Seen = 1,
+  Seen = 3,
   Send = 2,
-  Delivered = 3,
+  Delivered = 1,
 }
 
 export interface Message {
@@ -78,7 +78,7 @@ export interface ParticipantUser {
 
 export interface Chat {
   _id: string;
-  lastMessage: string;
+  lastMessage: any;
   unreadMessagesCount: number;
   conversationKey: string;
   isActive: boolean;

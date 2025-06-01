@@ -75,7 +75,11 @@ const Header = ({ currentChat, toggleSidebar }: HeaderProps) => {
           </div>
 
           <div className="flex flex-col">
-            <TypingIndicator chatId={currentChat._id} />
+            <TypingIndicator
+              chatId={currentChat._id}
+              chat={currentChat}
+              isHeader={true}
+            />
           </div>
         </div>
       </header>

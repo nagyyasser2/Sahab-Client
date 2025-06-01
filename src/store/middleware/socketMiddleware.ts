@@ -1,4 +1,9 @@
-import { updateUserStatus } from "../slices/chatSlice";
+import {
+  addChatToList,
+  incrementUnreadMessages,
+  updateLastMessage,
+  updateUserStatus,
+} from "../slices/chatSlice";
 import socket, { SOCKET_EVENTS } from "../../api/socket";
 import {
   type Dispatch,
@@ -31,6 +36,16 @@ const socketMiddleware = (): Middleware<{}, RootState> => {
     // Listen for incoming messages
     socket.on(SOCKET_EVENTS.RECEIVE_MESSAGE, (message) => {
       store.dispatch(addMessage(message));
+
+      store.dispatch(
+        incrementUnreadMessages({ chatId: message?.conversationId })
+      );
+      store.dispatch(
+        updateLastMessage({
+          chatId: message?.conversationId,
+          message,
+        })
+      );
     });
 
     // Listen for message read events
@@ -46,6 +61,10 @@ const socketMiddleware = (): Middleware<{}, RootState> => {
     // Listen for user online/offline status
     socket.on(SOCKET_EVENTS.USER_STATUS_UPDATE, ({ userId, status }) => {
       store.dispatch(updateUserStatus({ userId, status: status }));
+    });
+
+    socket.on(SOCKET_EVENTS.NEW_CONVERSATION, (payload) => {
+      store.dispatch(addChatToList(payload));
     });
 
     // The actual middleware
