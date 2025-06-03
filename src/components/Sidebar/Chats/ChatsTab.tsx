@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FiArrowLeft, FiArrowRight, FiLock } from "react-icons/fi";
 import {
   fetchChats,
   setCurrentChat,
@@ -8,7 +8,8 @@ import {
 } from "../../../store/slices/chatSlice";
 import type { Chat } from "../../../types";
 import { setSelectedUser } from "../../../store/slices/usersSlice";
-import TypingIndicator from "./TypingIndicator"; // Import the new component
+import TypingIndicator from "./TypingIndicator";
+import ChatStatusNav from "./ChatStatusNav";
 
 type SideBarProp = {
   closeSidebar: () => void;
@@ -16,6 +17,7 @@ type SideBarProp = {
 
 const ChatsTab = ({ closeSidebar }: SideBarProp) => {
   const dispatch = useDispatch();
+  const [activeTab, setActiveTab] = useState("active");
 
   const { chats, loading, error, total, page, limit } = useSelector(
     (state: any) => state.chats
@@ -24,6 +26,15 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
   useEffect(() => {
     dispatch(fetchChats({ page, limit }) as any);
   }, [dispatch, page, limit]);
+
+  // Filter chats based on active tab
+  const filteredChats = chats.filter((chat: Chat) => {
+    if (activeTab === "blocked") {
+      return chat.isBlocked === true;
+    } else {
+      return chat.isBlocked !== true; // Show non-blocked chats for "active" tab
+    }
+  });
 
   const totalPages = Math.ceil(total / limit);
 
@@ -40,12 +51,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Title */}
-      <div className="px-4 pt-4 pb-2 flex-shrink-0">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 font-medium">
-          Recent Chats
-        </h3>
-      </div>
+      <ChatStatusNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Chat List */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4">
@@ -58,26 +64,44 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
             Error loading chats:{" "}
             {typeof error === "string" ? error : "An error occurred"}
           </div>
-        ) : chats.length === 0 ? (
-          <div className="text-center py-4 text-gray-500">No chats found</div>
+        ) : filteredChats.length === 0 ? (
+          <div className="text-center py-4 text-gray-500">
+            No {activeTab === "blocked" ? "blocked" : "available"} chats found
+          </div>
         ) : (
           <ul className="space-y-2 py-2 overflow-y-auto scrollbar-custom">
-            {chats.map((chat: Chat) => (
+            {filteredChats.map((chat: Chat) => (
               <li
                 key={chat._id}
-                className="p-2 rounded hover:bg-gray-200 cursor-pointer flex justify-between items-center"
+                className={`p-2 rounded hover:bg-gray-200 cursor-pointer flex justify-between items-center ${
+                  chat.isBlocked ? "opacity-80" : ""
+                }`}
                 onClick={() => handleChatSelection(chat)}
               >
                 <div className="flex items-center space-x-2">
-                  <img
-                    src={chat.otherParticipant?.profilePic}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
+                  <div className="relative">
+                    <img
+                      src={chat.otherParticipant?.profilePic}
+                      alt="Profile"
+                      className={`w-10 h-10 rounded-full object-cover ${
+                        chat.isBlocked ? "grayscale" : ""
+                      }`}
+                    />
+                    {chat.isBlocked && (
+                      <div className="absolute -top-1 -right-1 bg-red-500 text-white p-0.5 rounded-full">
+                        <FiLock className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <span className="font-medium block">
-                      {chat.otherParticipant?.username}
-                    </span>
+                    <div className="flex items-center space-x-1">
+                      <span className="font-medium block truncate">
+                        {chat.otherParticipant?.username}
+                      </span>
+                      {chat.isBlocked && (
+                        <span className="text-xs text-red-500">(Blocked)</span>
+                      )}
+                    </div>
                     <span className="text-xs text-gray-500 truncate max-w-[160px]">
                       <TypingIndicator
                         chatId={chat._id}
@@ -104,7 +128,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
       </div>
 
       {/* Pagination */}
-      {!loading && chats.length > 0 && (
+      {!loading && filteredChats.length > 0 && (
         <div className="sticky bottom-0 z-10 bg-white px-4 py-1 pb-4 shadow-md">
           <div className="flex justify-center items-center max-w-md mx-auto">
             <div className="flex justify-center items-center space-x-2">

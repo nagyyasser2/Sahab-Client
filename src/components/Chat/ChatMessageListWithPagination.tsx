@@ -5,10 +5,12 @@ import {
   fetchMessages,
   selectMessagesByChatId,
 } from "../../store/slices/messageSlice";
-import { resetUnreadMessages } from "../../store/slices/chatSlice"; // Import the new action
+import { resetUnreadMessages } from "../../store/slices/chatSlice";
 import { emitSocketAction } from "../../store/middleware/socketMiddleware";
 import { SOCKET_ACTIONS } from "../../api/socket";
 import { type Message } from "../../types";
+import ChatMessagesSkeleton from "./ChatMessagesSkeleton";
+import LoadingMoreSkeleton from "./LoadingMoreSkeleton";
 
 type ChatMessageListProps = {
   currentChat: any;
@@ -31,7 +33,9 @@ const ChatMessageList = ({
   const [messageCount, setMessageCount] = useState(0);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
-  const [hasResetUnreadMessages, setHasResetUnreadMessages] = useState(false); // New state
+  const [hasResetUnreadMessages, setHasResetUnreadMessages] = useState(false);
+  const [showContentAfterSkeleton, setShowContentAfterSkeleton] =
+    useState(false);
 
   const messages = useSelector((state: any) =>
     selectMessagesByChatId(state, currentChat._id)
@@ -53,11 +57,9 @@ const ChatMessageList = ({
   const scrollToBottom = useCallback((behavior: "auto" | "smooth" = "auto") => {
     const container = messagesContainerRef.current;
     if (container) {
-      // Use both scrollTop and scrollIntoView for better reliability
       container.scrollTop = container.scrollHeight;
     }
 
-    // Also use scrollIntoView as backup
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior });
     }, 0);
@@ -80,10 +82,7 @@ const ChatMessageList = ({
 
       if (!container) return;
 
-      // Store the first visible message element before loading new messages
       const containerTop = container.getBoundingClientRect().top;
-
-      // Find the first visible message element (the one that was at the top)
       let firstVisibleMessage = null;
       const messageElements = container.querySelectorAll("[data-message-id]");
 
@@ -106,17 +105,14 @@ const ChatMessageList = ({
         }) as any
       ).unwrap();
 
-      // Wait for DOM update, then position to show some new messages + the previous top message
       setTimeout(() => {
         if (container && firstVisibleMessage && result.messages.length > 0) {
-          // Find the same message element after new messages are loaded
           const messageId = firstVisibleMessage.getAttribute("data-message-id");
           const updatedMessageElement = container.querySelector(
             `[data-message-id="${messageId}"]`
           );
 
           if (updatedMessageElement) {
-            // Get all message elements to find newly loaded ones
             const allMessageElements =
               container.querySelectorAll("[data-message-id]");
             const messageArray = Array.from(allMessageElements);
@@ -124,7 +120,6 @@ const ChatMessageList = ({
               (el) => el.getAttribute("data-message-id") === messageId
             );
 
-            // Show 2-3 messages before the target message (newly loaded ones)
             const messagesToShowBefore = Math.min(3, targetMessageIndex);
             const scrollTargetIndex = Math.max(
               0,
@@ -133,9 +128,8 @@ const ChatMessageList = ({
             const scrollTargetElement: any = messageArray[scrollTargetIndex];
 
             if (scrollTargetElement) {
-              // Scroll to show the target element with some padding
               const elementTop = scrollTargetElement.offsetTop;
-              container.scrollTop = Math.max(0, elementTop - 20); // 20px padding from top
+              container.scrollTop = Math.max(0, elementTop - 20);
             }
           }
         }
@@ -173,10 +167,16 @@ const ChatMessageList = ({
       setShouldAutoScroll(true);
       setIsInitialLoadComplete(false);
       setHasScrolledToBottom(false);
-      setHasResetUnreadMessages(false); // Reset this flag for new chat
+      setHasResetUnreadMessages(false);
+      setShowContentAfterSkeleton(false);
 
       try {
-        await dispatch(
+        // Show skeleton for at least 1 second for smooth UX
+        const minLoadingTime = new Promise((resolve) =>
+          setTimeout(resolve, 1000)
+        );
+
+        const messagesPromise = dispatch(
           fetchMessages({
             chatId: currentChat._id,
             receiverId: currentChat.otherParticipant?._id,
@@ -185,13 +185,21 @@ const ChatMessageList = ({
           }) as any
         ).unwrap();
 
+        await Promise.all([minLoadingTime, messagesPromise]);
+
         dispatch(
           emitSocketAction(SOCKET_ACTIONS.JOIN_CHAT, {
             chatId: currentChat._id,
           }) as any
         );
+
+        // Small delay before showing content to ensure smooth transition
+        setTimeout(() => {
+          setShowContentAfterSkeleton(true);
+        }, 100);
       } catch (error) {
         console.error("Failed to initialize chat:", error);
+        setShowContentAfterSkeleton(true); // Show content even on error
       } finally {
         setIsInitialLoading(false);
       }
@@ -212,11 +220,11 @@ const ChatMessageList = ({
   useEffect(() => {
     if (
       !isInitialLoading &&
+      showContentAfterSkeleton &&
       messages &&
       messages.length > 0 &&
       !hasScrolledToBottom
     ) {
-      // Use multiple timeouts to ensure DOM is fully rendered
       const timeouts = [0, 50, 100, 200];
 
       timeouts.forEach((delay) => {
@@ -225,13 +233,18 @@ const ChatMessageList = ({
         }, delay);
       });
 
-      // Mark as complete after final scroll attempt
       setTimeout(() => {
         setIsInitialLoadComplete(true);
         setHasScrolledToBottom(true);
       }, 300);
     }
-  }, [isInitialLoading, messages, hasScrolledToBottom, scrollToBottom]);
+  }, [
+    isInitialLoading,
+    showContentAfterSkeleton,
+    messages,
+    hasScrolledToBottom,
+    scrollToBottom,
+  ]);
 
   // Reset unread messages count after first render and initial load completion
   useEffect(() => {
@@ -295,39 +308,43 @@ const ChatMessageList = ({
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
+  // Show skeleton during initial loading
+  if (isInitialLoading || !showContentAfterSkeleton) {
+    return <ChatMessagesSkeleton messageCount={8} />;
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white">
       <div
         ref={messagesContainerRef}
         className="flex-1 px-3 py-2 overflow-y-auto scrollbar-hide"
       >
-        {isInitialLoading ? (
-          <div className="flex justify-center items-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          </div>
-        ) : sortedMessages.length === 0 ? (
-          <div className="flex justify-center items-center h-full text-gray-500">
-            No messages yet. Start a conversation!
+        {sortedMessages.length === 0 ? (
+          <div className="flex justify-center items-center h-full text-gray-500 animate-fade-in">
+            <div className="text-center">
+              <div className="text-6xl mb-4">💬</div>
+              <div className="text-lg font-medium mb-2">No messages yet</div>
+              <div className="text-sm">Start a conversation!</div>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
             {hasMoreMessages && (
               <div ref={topRef} className="h-1">
-                {isLoadingMore && (
-                  <div className="flex justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                  </div>
-                )}
+                {isLoadingMore && <LoadingMoreSkeleton messageCount={3} />}
               </div>
             )}
 
             {!hasMoreMessages && (
-              <div className="flex justify-center py-4 text-sm text-gray-400">
-                No more messages
+              <div className="flex justify-center py-4 text-sm text-gray-400 animate-fade-in">
+                <div className="flex items-center gap-2">
+                  <span>🎉</span>
+                  <span>You've reached the beginning</span>
+                </div>
               </div>
             )}
 
-            {sortedMessages.map((message: Message) => {
+            {sortedMessages.map((message: Message, index: number) => {
               const isMyMessage = message.senderId === currentUser._id;
               return (
                 <div
@@ -335,10 +352,14 @@ const ChatMessageList = ({
                   data-message-id={message._id}
                   className={`flex ${
                     isMyMessage ? "justify-end" : "justify-start"
-                  }`}
+                  } animate-message-appear`}
+                  style={{
+                    animationDelay: `${index * 0.05}s`,
+                    animationFillMode: "both",
+                  }}
                 >
                   <div
-                    className={`max-w-sm px-4 py-2 rounded-xl shadow transition-all duration-200 hover:shadow-md ${
+                    className={`max-w-sm px-4 py-2 rounded-xl shadow transition-all duration-200 hover:shadow-md transform hover:scale-[1.02] ${
                       isMyMessage
                         ? "bg-blue-500 text-white rounded-br-none"
                         : "bg-gray-100 text-gray-800 rounded-bl-none"
@@ -368,7 +389,7 @@ const ChatMessageList = ({
   );
 };
 
-// CSS styles
+// Enhanced CSS styles with new animations
 const styles = `
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
@@ -377,6 +398,65 @@ const styles = `
     -ms-overflow-style: none;
     scrollbar-width: none;
     scroll-behavior: smooth;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDownFade {
+    from {
+      opacity: 0;
+      transform: translateY(-15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes messageAppear {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  .animate-slide-down-fade {
+    animation: slideDownFade 0.4s ease-out;
+  }
+
+  .animate-message-appear {
+    opacity: 0;
+    animation: messageAppear 0.3s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
   }
 `;
 

@@ -87,11 +87,13 @@ export interface Chat {
   isArchived: boolean;
   messageCount: number;
   otherParticipant: ParticipantUser;
+  blockStatus: any;
+  isBlocked: boolean;
 }
 
 export interface ChatState {
   chats: Chat[];
-  currentChat: Chat;
+  currentChat: any;
   loading: boolean;
   error: any;
   userStatuses: Record<string, string | null>;
@@ -100,4 +102,5 @@ export interface ChatState {
   total: number;
   page: number;
   limit: number;
+  blockingStatus: any;
 }

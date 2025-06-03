@@ -6,13 +6,14 @@ import { SOCKET_ACTIONS } from "../../api/socket";
 import type { ParticipantUser } from "../../types";
 
 type ChatInputProps = {
+  isBlocked: boolean;
   currentChat: {
     _id: string;
     otherParticipant: ParticipantUser;
   };
 };
 
-const ChatInput = ({ currentChat }: ChatInputProps) => {
+const ChatInput = ({ currentChat, isBlocked }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<any>(null);

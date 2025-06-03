@@ -2,15 +2,15 @@ import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../../features/auth/authTypes";
 import { FiLogOut, FiChevronDown, FiChevronUp, FiEdit } from "react-icons/fi";
-import ConfirmationModal from "../common/ConfirmationModal";
-import Spinner from "../common/Spinner";
+import ConfirmationModal from "../Common/ConfirmationModal";
+import Spinner from "../Common/Spinner";
 import { authApi } from "../../api/endpoints/authApi";
 import logoUrl from "../../../public/test2.svg";
-import OnlineStatus from "../common/OnlineStatus";
+import OnlineStatus from "../Common/OnlineStatus";
 import { IoLocationOutline } from "react-icons/io5";
 import { BiMobileAlt } from "react-icons/bi";
 import EditUserProfile from "./EditUserProfile";
-import ImagePopup from "../common/ImagePopup"; // Import the ImagePopup component
+import ImagePopup from "../Common/ImagePopup"; // Import the ImagePopup component
 import { useDispatch } from "react-redux";
 import { setCurrentChat } from "../../store/slices/chatSlice";
 
@@ -216,10 +216,9 @@ const UserProfile: React.FC<UserProfileProps> = ({
               className="mt-2 cursor-pointer flex items-center gap-2 hover:text-gray-500 transition-all duration-200"
             >
               <FiEdit />
-              Edit
             </button>
             {/* User Info */}
-            <h2 className="mt-4 text-xl font-semibold text-gray-800 underline">
+            <h2 className="mt-2 text-xl font-semibold text-gray-800 underline">
               {user.username}
             </h2>
 
@@ -247,7 +246,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
               ) : (
                 <>
                   <FiLogOut className="text-md" />
-                  logout
+                  <span className="text-sm">LogOut</span>
                 </>
               )}
             </button>

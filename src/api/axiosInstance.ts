@@ -101,6 +101,22 @@ export const chatService = {
   updateChat: (id: string, data: any) =>
     axiosInstance.put(`/chats/${id}`, data),
   deleteChat: (id: string) => axiosInstance.delete(`/chats/${id}`),
+  // Block/Unblock API methods
+  blockUser: (conversationId: string, targetUserId: string) =>
+    axiosInstance.post(`/conversations/${conversationId}/block`, {
+      targetUserId,
+    }),
+
+  unblockUser: (conversationId: string, targetUserId: string) =>
+    axiosInstance.post(`/conversations/${conversationId}/unblock`, {
+      targetUserId,
+    }),
+
+  getBlockStatus: (conversationId: string) =>
+    axiosInstance.get(`/conversations/${conversationId}/block-status`),
+
+  isUserBlocked: (conversationId: string) =>
+    axiosInstance.get(`/conversations/${conversationId}/is-blocked`),
 };
 
 export const messageService = {

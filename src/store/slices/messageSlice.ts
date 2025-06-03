@@ -4,7 +4,6 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import { messageService } from "../../api/axiosInstance";
-import { SOCKET_ACTIONS } from "../../api/socket";
 import { MessageStatus, type Message, type RootState } from "../../types";
 
 // State interface

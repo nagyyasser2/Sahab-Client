@@ -74,13 +74,6 @@ const UsersTab = ({ closeSidebar }: SideBarProp) => {
         <SearchUsersForm onSearch={updateSearchParams} />
       </div>
 
-      {/* Title */}
-      <div className="px-4 pt-2 pb-1 flex-shrink-0">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 font-medium">
-          People
-        </h3>
-      </div>
-
       {/* Scrollable List */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4">
         {loading ? (

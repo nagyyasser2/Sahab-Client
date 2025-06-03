@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
-import { FormInput } from "../common/FormInput";
-import { FormSelect } from "../common/FormSelect";
-import { Button } from "../common/Button";
+import { FormInput } from "../Common/FormInput";
+import { FormSelect } from "../Common/FormSelect";
+import { Button } from "../Common/Button";
 import { FiCamera, FiUpload } from "react-icons/fi";
 import {
   usernameValidator,

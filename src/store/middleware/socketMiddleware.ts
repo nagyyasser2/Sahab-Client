@@ -1,6 +1,7 @@
 import {
   addChatToList,
   incrementUnreadMessages,
+  updateChatBlockStatus,
   updateLastMessage,
   updateUserStatus,
 } from "../slices/chatSlice";
@@ -67,6 +68,15 @@ const socketMiddleware = (): Middleware<{}, RootState> => {
       store.dispatch(addChatToList(payload));
     });
 
+    socket.on(SOCKET_EVENTS.UPDATE_BLOCK_STATUS, (payload) => {
+      store.dispatch(updateChatBlockStatus(payload));
+      // store.dispatch(
+      //   updateBlockStatus({
+      //     chatId: payload.conversationId,
+      //     isBlocked: payload.blockStatus.canSendMessages,
+      //   })
+      // );
+    });
     // The actual middleware
     return (next) => (action: any) => {
       // Check if the action is intended for socket emission

@@ -23,6 +23,7 @@ export const SOCKET_EVENTS = {
   USER_STATUS_UPDATE: "user_status_update",
   USER_STATUS_CHECK: "user_status_check",
   NEW_CONVERSATION: "new_conversation",
+  UPDATE_BLOCK_STATUS: "update_block_status",
 };
 
 // Socket actions
