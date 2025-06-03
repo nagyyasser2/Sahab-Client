@@ -99,7 +99,7 @@ const ChatsTab = ({ closeSidebar }: SideBarProp) => {
                         {chat.otherParticipant?.username}
                       </span>
                       {chat.isBlocked && (
-                        <span className="text-xs text-red-500">(Blocked)</span>
+                        <span className="text-xs text-red-500"></span>
                       )}
                     </div>
                     <span className="text-xs text-gray-500 truncate max-w-[160px]">
